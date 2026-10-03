@@ -165,11 +165,12 @@ def create_ingest_key() -> None:
 def invoke_test(stop_code: str) -> None:
     import json
     lam = session().client("lambda")
+    app_id = os.environ.get("ALEXA_SKILL_ID", "test")
     event = {
         "version": "1.0",
-        "session": {"new": True, "sessionId": "s", "application": {"applicationId": "test"},
+        "session": {"new": True, "sessionId": "s", "application": {"applicationId": app_id},
                     "user": {"userId": "amzn1.ask.account.DEPLOYTEST"}},
-        "context": {"System": {"application": {"applicationId": "test"},
+        "context": {"System": {"application": {"applicationId": app_id},
                                "user": {"userId": "amzn1.ask.account.DEPLOYTEST"},
                                "device": {"deviceId": "d", "supportedInterfaces": {}}}},
         "request": {"type": "IntentRequest", "requestId": "r", "locale": "en-GB",
