@@ -34,6 +34,43 @@ Bootstrap once with `--trusted-host pypi.org --trusted-host files.pythonhosted.o
 newer pip then uses the Windows certificate store automatically. The local tools call
 `truststore.inject_into_ssl()` for the same reason. Never use `verify=False`.
 
+## Tests
+
+```powershell
+.\.venv\Scripts\python -m pytest -q
+```
+
+## Deploying (first time)
+
+Everything is driven by `tools/deploy.py` (boto3 only; no AWS CLI or SAM needed).
+
+1. AWS credentials on this PC. In the AWS console create an IAM user with
+   `AdministratorAccess` (or at least CloudFormation, IAM, Lambda, DynamoDB, SSM, Logs, Budgets),
+   create an access key, and save it to `%USERPROFILE%\.aws\credentials`:
+
+   ```ini
+   [default]
+   aws_access_key_id = AKIA...
+   aws_secret_access_key = ...
+   ```
+
+2. Put `ALEXA_SKILL_ID` (from the Alexa developer console, skill list -> "Copy Skill ID"),
+   `ALERT_EMAIL` and a fresh `NTA_API_KEY` in `.env`.
+3. `python tools/deploy.py all` creates the stack (table, Lambda, role, budget, ingest IAM user),
+   stores the NTA key in SSM, builds `build/lambda.zip` and uploads it. It prints the Lambda ARN.
+4. First timetable load from this PC (about 50 minutes, paced under 25 WCU/s):
+   `python -m ingest.build_timetable`
+5. In the Alexa developer console: Build -> JSON Editor -> paste
+   `skill-package/interactionModels/custom/en-GB.json` -> Save and Build Model.
+   Endpoint -> AWS Lambda ARN -> paste the ARN from step 3 -> Save.
+6. `python tools/deploy.py test --stop 184` invokes the Lambda directly; then use the
+   console Test tab or an Echo: "Alexa, ask four next bus from stop 184".
+7. Daily refresh via GitHub Actions: `python tools/deploy.py ingest-key` prints an access key for
+   the least-privilege ingest user; add it as repository secrets `AWS_ACCESS_KEY_ID` /
+   `AWS_SECRET_ACCESS_KEY`. The workflow in `.github/workflows/ingest.yml` runs at 03:40 UTC.
+
+Later code changes: `python tools/deploy.py code`. Template changes: `python tools/deploy.py stack ...`.
+
 ## Data sources
 
 - Realtime: `https://api.nationaltransport.ie/gtfsr/v2/TripUpdates` (header `x-api-key`), max 1 call / 60 s.
