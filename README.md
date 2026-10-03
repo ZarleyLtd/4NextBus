@@ -54,7 +54,8 @@ Everything is driven by `tools/deploy.py` (boto3 only; no AWS CLI or SAM needed)
    aws_secret_access_key = ...
    ```
 
-2. Put `ALEXA_SKILL_ID` (from the Alexa developer console, skill list -> "Copy Skill ID"),
+2. Put `ALEXA_SKILL_ID` (from the Alexa developer console, skill list -> "Copy Skill ID"; up to
+   two IDs comma-separated if you have a live skill and a development copy),
    `ALERT_EMAIL` and a fresh `NTA_API_KEY` in `.env`.
 3. `python tools/deploy.py all` creates the stack (table, Lambda, role, budget, ingest IAM user),
    stores the NTA key in SSM, builds `build/lambda.zip` and uploads it. It prints the Lambda ARN.

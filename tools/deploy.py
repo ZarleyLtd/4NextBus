@@ -51,8 +51,12 @@ def session():
 def deploy_stack(skill_id: str, email: str, reserved: str) -> None:
     cfn = session().client("cloudformation")
     template = (ROOT / "template.yaml").read_text(encoding="utf-8")
+    ids = [s.strip() for s in skill_id.split(",") if s.strip()]
+    if not 1 <= len(ids) <= 2:
+        sys.exit("--skill-id takes one or two comma-separated skill IDs")
     params = [
-        {"ParameterKey": "SkillId", "ParameterValue": skill_id},
+        {"ParameterKey": "SkillId", "ParameterValue": ids[0]},
+        {"ParameterKey": "SecondSkillId", "ParameterValue": ids[1] if len(ids) > 1 else ""},
         {"ParameterKey": "AlertEmail", "ParameterValue": email},
         {"ParameterKey": "TableName", "ParameterValue": TABLE},
         {"ParameterKey": "FunctionName", "ParameterValue": FUNCTION},
@@ -165,7 +169,7 @@ def create_ingest_key() -> None:
 def invoke_test(stop_code: str) -> None:
     import json
     lam = session().client("lambda")
-    app_id = os.environ.get("ALEXA_SKILL_ID", "test")
+    app_id = os.environ.get("ALEXA_SKILL_ID", "test").split(",")[0].strip()
     event = {
         "version": "1.0",
         "session": {"new": True, "sessionId": "s", "application": {"applicationId": app_id},

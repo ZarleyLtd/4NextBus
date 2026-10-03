@@ -185,13 +185,36 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
         return handler_input.response_builder.speak(speech).set_should_end_session(True).response
 
 
+class SkillIdVerificationError(Exception):
+    pass
+
+
+def _application_id(event: dict) -> str | None:
+    system = ((event.get("context") or {}).get("System") or {})
+    app = system.get("application") or ((event.get("session") or {}).get("application") or {})
+    return app.get("applicationId")
+
+
+def verify_skill_id(event: dict) -> None:
+    """ask-sdk only supports a single skill ID; we allow several (e.g. dev + live copies)."""
+    if not config.SKILL_IDS:
+        return
+    app_id = _application_id(event)
+    if app_id not in config.SKILL_IDS:
+        log.error("skill ID verification failed for %r", app_id)
+        raise SkillIdVerificationError(f"unexpected skill ID {app_id!r}")
+
+
 sb = SkillBuilder()
-if config.SKILL_ID:
-    sb.skill_id = config.SKILL_ID
 for h in (LaunchRequestHandler(), NextBusIntentHandler(), SetFavouriteStopIntentHandler(),
           GetFavouriteStopIntentHandler(), HelpIntentHandler(), CancelOrStopIntentHandler(),
           FallbackIntentHandler(), SessionEndedRequestHandler()):
     sb.add_request_handler(h)
 sb.add_exception_handler(CatchAllExceptionHandler())
 
-handler = sb.lambda_handler()
+_sdk_handler = sb.lambda_handler()
+
+
+def handler(event, context):
+    verify_skill_id(event)
+    return _sdk_handler(event, context)

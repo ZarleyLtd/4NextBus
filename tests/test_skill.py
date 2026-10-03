@@ -134,3 +134,14 @@ def test_timetable_not_loaded_is_graceful(wired):
     wired.codes = {}
     resp = app.handler(intent("NextBusIntent", stopNumber="184"), None)
     assert "timetable isn't loaded yet" in speech(resp)
+
+
+def test_skill_id_verification_accepts_any_listed_id(monkeypatch):
+    monkeypatch.setattr(app.config, "SKILL_IDS", frozenset({"amzn1.ask.skill.other", "amzn1.ask.skill.test"}))
+    assert "Goodbye" in speech(app.handler(intent("AMAZON.StopIntent"), None))
+
+
+def test_skill_id_verification_rejects_unknown_id(monkeypatch):
+    monkeypatch.setattr(app.config, "SKILL_IDS", frozenset({"amzn1.ask.skill.other"}))
+    with pytest.raises(app.SkillIdVerificationError):
+        app.handler(intent("AMAZON.StopIntent"), None)

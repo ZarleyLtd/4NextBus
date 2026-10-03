@@ -7,7 +7,8 @@ from functools import lru_cache
 
 TABLE_NAME = os.environ.get("FOURNEXTBUS_TABLE", "FourNextBus")
 REGION = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or "eu-west-1"
-SKILL_ID = os.environ.get("ALEXA_SKILL_ID")  # verified by ask-sdk when set
+# Comma-separated list of Alexa skill IDs allowed to invoke the handler (empty = no check).
+SKILL_IDS = frozenset(s.strip() for s in os.environ.get("ALEXA_SKILL_ID", "").split(",") if s.strip())
 NTA_KEY_PARAM = os.environ.get("NTA_API_KEY_PARAM", "/4nextbus/nta_api_key")
 
 
