@@ -1,0 +1,133 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "four next bus",
+      "intents": [
+        {
+          "name": "NextBusIntent",
+          "slots": [
+            { "name": "stopNumber", "type": "AMAZON.NUMBER" }
+          ],
+          "samples": [
+            "from stop {stopNumber}",
+            "from stop number {stopNumber}",
+            "for stop {stopNumber}",
+            "for stop number {stopNumber}",
+            "stop {stopNumber}",
+            "stop number {stopNumber}",
+            "buses from stop {stopNumber}",
+            "buses at stop {stopNumber}",
+            "the next bus from stop {stopNumber}",
+            "the next bus at stop {stopNumber}",
+            "when is the next bus from stop {stopNumber}",
+            "when is the next bus at stop {stopNumber}",
+            "what's the next bus from stop {stopNumber}",
+            "what time is the next bus from stop {stopNumber}",
+            "next bus",
+            "next buses",
+            "the next bus",
+            "for the next bus",
+            "for the next buses",
+            "when is the next bus",
+            "when is my next bus",
+            "what's the next bus",
+            "what time is the next bus",
+            "from my favourite stop",
+            "from my stop",
+            "for my stop",
+            "buses from my favourite stop",
+            "the next bus from my favourite stop"
+          ]
+        },
+        {
+          "name": "SetFavouriteStopIntent",
+          "slots": [
+            { "name": "stopNumber", "type": "AMAZON.NUMBER" }
+          ],
+          "samples": [
+            "to set my favourite stop to {stopNumber}",
+            "set my favourite stop to {stopNumber}",
+            "set my favourite stop to stop {stopNumber}",
+            "set favourite stop {stopNumber}",
+            "set my favourite stop",
+            "to set my favourite stop",
+            "change my favourite stop to {stopNumber}",
+            "to change my favourite stop to {stopNumber}",
+            "make {stopNumber} my favourite stop",
+            "make stop {stopNumber} my favourite",
+            "remember stop {stopNumber}",
+            "to remember stop {stopNumber}",
+            "save stop {stopNumber}",
+            "to save stop {stopNumber} as my favourite",
+            "my stop is {stopNumber}",
+            "to set my favorite stop to {stopNumber}",
+            "set my favorite stop to {stopNumber}"
+          ]
+        },
+        {
+          "name": "GetFavouriteStopIntent",
+          "slots": [],
+          "samples": [
+            "for my favourite stop",
+            "what is my favourite stop",
+            "what's my favourite stop",
+            "what is my favourite stop number",
+            "which stop is my favourite",
+            "to remind me of my favourite stop",
+            "what stop is saved",
+            "for my favorite stop",
+            "what is my favorite stop"
+          ]
+        },
+        { "name": "AMAZON.HelpIntent", "samples": [] },
+        { "name": "AMAZON.StopIntent", "samples": [] },
+        { "name": "AMAZON.CancelIntent", "samples": [] },
+        { "name": "AMAZON.FallbackIntent", "samples": [] },
+        { "name": "AMAZON.NavigateHomeIntent", "samples": [] }
+      ],
+      "types": []
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "NextBusIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "stopNumber",
+              "type": "AMAZON.NUMBER",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": { "elicitation": "Elicit.Slot.stopNumber" }
+            }
+          ]
+        },
+        {
+          "name": "SetFavouriteStopIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "stopNumber",
+              "type": "AMAZON.NUMBER",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": { "elicitation": "Elicit.Slot.stopNumber" }
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "SKILL_RESPONSE"
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.stopNumber",
+        "variations": [
+          { "type": "PlainText", "value": "Which stop number?" },
+          { "type": "PlainText", "value": "What's the number on the bus stop pole?" }
+        ]
+      }
+    ]
+  }
+}
