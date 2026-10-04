@@ -38,7 +38,7 @@
       "containsAds": false,
       "locales": {
         "en-GB": {
-          "privacyPolicyUrl": "",
+          "privacyPolicyUrl": "https://zarleyltd.github.io/4NextBus/privacy.html",
           "termsOfUseUrl": ""
         }
       }
