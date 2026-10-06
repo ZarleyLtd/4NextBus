@@ -141,7 +141,7 @@ class GtfsStatic:
             join trips t on t.trip_id = st.trip_id
             join routes r on r.route_id = t.route_id
             where st.stop_id = ? and st.pickup_type is distinct from '1'
-            order by st.departure_time
+            order by st.departure_time, st.trip_id, st.stop_sequence
         """, [stop_id]).fetchall()
         from src.common.gtfs_time import parse_gtfs_time
         deps = [Departure(tid, route, head, parse_gtfs_time(dep), sid, int(seq))
@@ -156,7 +156,7 @@ class GtfsStatic:
                                     headsign := coalesce(nullif(st.stop_headsign,''), t.trip_headsign, ''),
                                     dep := st.departure_time, service_id := t.service_id,
                                     seq := cast(st.stop_sequence as integer))
-                        order by st.departure_time) as deps
+                        order by st.departure_time, st.trip_id, st.stop_sequence) as deps
             from stop_times st
             join trips t on t.trip_id = st.trip_id
             join routes r on r.route_id = t.route_id and r.route_type = '{BUS_ROUTE_TYPE}'

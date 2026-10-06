@@ -81,6 +81,8 @@ def main() -> int:
     if store:
         old_manifest, old_version = store.get_manifest()
         log.info("manifest: %d stops, feed version %s", len(old_manifest), old_version)
+        if old_version and old_version != feed_version:
+            log.info("new GTFS publish (%s -> %s); many stop rewrites expected", old_version, feed_version)
     if args.force:
         old_manifest = {}
 
