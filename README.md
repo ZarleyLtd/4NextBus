@@ -239,7 +239,8 @@ Everything is driven by `tools/deploy.py` (boto3 only; no AWS CLI or SAM needed)
    console Test tab or an Echo: "Alexa, ask four next bus from stop 184".
 7. Daily refresh via GitHub Actions: `python tools/deploy.py ingest-key` prints an access key for
    the least-privilege ingest user; add it as repository secrets `AWS_ACCESS_KEY_ID` /
-   `AWS_SECRET_ACCESS_KEY`. The workflow in `.github/workflows/ingest.yml` runs at 03:40 UTC.
+   `AWS_SECRET_ACCESS_KEY`. The workflow in `.github/workflows/ingest.yml` is scheduled at
+   00:10 UTC (after TFI's usual evening zip). GitHub public-repo crons often start hours late.
 
 Later code changes: `python tools/deploy.py code`. Template changes: `python tools/deploy.py stack ...`.
 
