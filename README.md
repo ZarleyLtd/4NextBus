@@ -248,6 +248,9 @@ Later code changes: `python tools/deploy.py code`. Template changes: `python too
 
 - Realtime: `https://api.nationaltransport.ie/gtfsr/v2/TripUpdates` (header `x-api-key`), max 1 call / 60 s.
 - Static timetable: `https://www.transportforireland.ie/transitData/Data/GTFS_Realtime.zip` (updated daily).
+  Ingest stores yesterday plus four more days of trips (5 days total) so a missed GitHub
+  run does not empty the skill; every TFI copy that runs in that window is kept for live
+  `trip_id` joins. Older copies in the zip are dropped to keep DynamoDB items small.
 - Users say the pole number (`stop_code`); the feed uses `stop_id` (e.g. `8220DB000184`).
 
 ## Free tier

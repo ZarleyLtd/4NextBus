@@ -5,6 +5,8 @@ Run in CI:     see .github/workflows/ingest.yml
 
 Only stops whose departures changed since the last run are written (hash manifest),
 and writes are paced to stay under the table's 25 WCU/s free-tier allowance.
+Each stop keeps every trip_id/service_id copy that can run in a 5-day window
+(yesterday through four more days). The rest of the TFI dump is not stored.
 """
 from __future__ import annotations
 
@@ -29,12 +31,13 @@ from dotenv import load_dotenv
 
 from ingest.gtfs_static import GtfsStatic, ensure_gtfs
 from src.common.gtfs_time import now_dublin
+from src.common.models import StopTimetable
 from src.common.store import Store, content_hash, pack
 
 log = logging.getLogger("ingest")
 
 WCU_BUDGET_PER_SECOND = 18.0      # leave headroom under the 25 WCU provisioned
-CALENDAR_DAYS = 16
+CALENDAR_DAYS = 5                 # yesterday + today + 3 more (ingest can miss several days)
 
 
 class WritePacer:
@@ -57,6 +60,25 @@ class WritePacer:
             time.sleep((need - self.tokens) / self.rate)
 
 
+def calendar_service_ids(calendar: dict) -> frozenset[str]:
+    ids: set[str] = set()
+    for services in calendar.values():
+        ids.update(services)
+    return frozenset(ids)
+
+
+def keep_window_departures(stop: StopTimetable, active: frozenset[str]) -> StopTimetable:
+    """Keep every TFI copy (trip_id + service_id) that can run in the stored calendar window."""
+    stop.departures = [d for d in stop.departures if d.service_id in active]
+    return stop
+
+
+def open_gtfs(cache: Path) -> GtfsStatic:
+    if (cache / "stop_times.txt").exists():
+        return GtfsStatic(cache)
+    return GtfsStatic(ensure_gtfs(cache))
+
+
 def main() -> int:
     load_dotenv(ROOT / ".env")
     ap = argparse.ArgumentParser()
@@ -71,9 +93,14 @@ def main() -> int:
     region = os.environ.get("AWS_REGION", "eu-west-1")
 
     t0 = time.perf_counter()
-    gtfs = GtfsStatic(ensure_gtfs(Path(args.cache)))
+    gtfs = open_gtfs(Path(args.cache))
     feed_version = gtfs.feed_version()
     log.info("GTFS feed version %s", feed_version)
+    cal_start = now_dublin().date() - timedelta(days=1)
+    calendar = gtfs.service_calendar(cal_start, days=CALENDAR_DAYS)
+    active = calendar_service_ids(calendar)
+    log.info("calendar %s .. %s (%d days, %d service ids)",
+             cal_start, cal_start + timedelta(days=CALENDAR_DAYS - 1), CALENDAR_DAYS, len(active))
 
     store = None if args.dry_run else Store(table, region)
     old_manifest: dict[str, str] = {}
@@ -88,13 +115,17 @@ def main() -> int:
 
     pacer = WritePacer()
     new_manifest: dict[str, str] = {}
-    stats = {"stops": 0, "written": 0, "unchanged": 0, "bytes": 0, "max_bytes": 0, "max_stop": ""}
+    stats = {"stops": 0, "written": 0, "unchanged": 0, "bytes": 0, "max_bytes": 0, "max_stop": "",
+             "deps_in": 0, "deps_kept": 0}
     sizes: list[int] = []
 
     for stop in gtfs.all_bus_stop_timetables():
         stats["stops"] += 1
         if args.limit and stats["stops"] > args.limit:
             break
+        stats["deps_in"] += len(stop.departures)
+        keep_window_departures(stop, active)
+        stats["deps_kept"] += len(stop.departures)
         rows = [d.to_row() for d in stop.departures]
         h = content_hash([stop.stop_code, stop.stop_name, rows])
         new_manifest[stop.stop_id] = h
@@ -123,7 +154,6 @@ def main() -> int:
             pacer.consume(1024)
 
     codes = gtfs.stop_code_map()
-    calendar = gtfs.service_calendar(now_dublin().date() - timedelta(days=1), days=CALENDAR_DAYS)
     if store:
         store.put_stop_codes(codes)
         store.put_calendar(calendar)
@@ -139,6 +169,9 @@ def main() -> int:
         pct = lambda p: sizes[min(len(sizes) - 1, int(p * len(sizes)))]
         log.info("item size bytes: p50 %d, p90 %d, p99 %d, max %d (%s)",
                  pct(0.5), pct(0.9), pct(0.99), stats["max_bytes"], stats["max_stop"])
+    in_, kept = stats["deps_in"], stats["deps_kept"]
+    log.info("departures kept %d / %d (%.0f%%) for %d-day window",
+             kept, in_, (100.0 * kept / in_) if in_ else 0.0, CALENDAR_DAYS)
     log.info("done: %d stops, %d written, %d unchanged, %d removed, %.1f MB, %d stop codes, %.0fs%s",
              stats["stops"], stats["written"], stats["unchanged"], len(removed), stats["bytes"] / 1e6,
              len(codes), time.perf_counter() - t0, " (dry run)" if args.dry_run else "")
