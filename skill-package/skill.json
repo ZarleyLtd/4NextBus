@@ -5,21 +5,21 @@
       "locales": {
         "en-GB": {
           "name": "4NextBus",
-          "summary": "Live Dublin bus times for any stop, plus a favourite stop you can ask about with one phrase.",
-          "description": "This skill tells you the next Dublin buses from your chosen bus stop, using the National Transport Authority's real-time data.\n\nSet or change your favourite stop by saying \"Alexa, ask 4NextBus to set my favourite stop to 184\". Then simply asking \"Alexa, ask 4NextBus\" gives you your local buses. Get a reminder of your favourite stop by saying \"Alexa, ask 4NextBus for my favourite stop\". Get buses for any stop by saying \"Alexa, ask 4NextBus from stop 184\".\n\nThe stop number is the number printed on the bus stop pole. Where live information is not available, timetable times are given instead.\n\nNote: this is not an official Dublin Bus or TFI skill. It uses publicly available real-time information provided by the National Transport Authority.",
+          "summary": "Live Dublin bus, LUAS, DART, and local commuter train times, with a favourite stop for each mode.",
+          "description": "This skill tells you the next Dublin buses, Luases, DART trains, or Irish Rail commuter trains, using the National Transport Authority's real-time data.\n\nFor buses, use the number on the pole: \"Alexa, ask four next bus from stop 184\". Set a favourite with \"Alexa, ask four next bus to set my favourite stop to 184\", then \"Alexa, ask four next bus\".\n\nFor Luas, Dart, or local train, say the mode after the skill name: \"Alexa, ask four next bus or LUAS from Dundrum southbound\". You can also say \"Alexa, ask four next bus to set my favourite LUAS stop to Dundrum southbound\" or \"Alexa, ask four next bus or LUAS to set my favourite stop to Dundrum southbound\". The same two wordings work for Dart and local train. Each mode has its own favourite.\n\nLocal train means Irish Rail Commuter, not DART or InterCity. Where live information is not available, timetable times are given instead.\n\nNote: this is not an official Dublin Bus, Luas, Irish Rail, or TFI skill. It uses publicly available real-time information provided by the National Transport Authority.",
           "examplePhrases": [
             "Alexa, ask four next bus from stop 184",
-            "Alexa, ask four next bus to set my favourite stop to 184",
-            "Alexa, ask four next bus for the next bus"
+            "Alexa, ask four next bus or LUAS from Dundrum southbound",
+            "Alexa, ask four next bus or LUAS to set my favourite stop to Dundrum southbound"
           ],
-          "keywords": ["dublin", "bus", "dublin bus", "real time", "rtpi", "tfi", "next bus", "ireland"],
+          "keywords": ["dublin", "bus", "luas", "dart", "commuter", "irish rail", "dublin bus", "real time", "rtpi", "tfi", "next bus", "ireland"],
           "smallIconUri": "",
           "largeIconUri": ""
         }
       },
       "isAvailableWorldwide": false,
       "distributionCountries": ["IE", "GB"],
-      "testingInstructions": "Say: ask four next bus from stop 184. Then: ask four next bus to set my favourite stop to 184. Then: ask four next bus for the next bus.",
+      "testingInstructions": "Bus: ask four next bus from stop 184; ask four next bus to set my favourite stop to 184; ask four next bus for the next bus. LUAS: ask four next bus or LUAS from Dundrum southbound; ask four next bus or LUAS to set my favourite stop to Dundrum southbound; ask four next bus to set my favourite LUAS stop to Dundrum southbound; ask four next bus or LUAS. Dart: ask four next bus or Dart from Pearse southbound. Local train: ask four next bus or local train from Maynooth westbound. History should show 4NextBus.",
       "category": "PUBLIC_TRANSPORTATION"
     },
     "apis": {

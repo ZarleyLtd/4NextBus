@@ -6,7 +6,10 @@
         {
           "name": "NextBusIntent",
           "slots": [
-            { "name": "stopNumber", "type": "AMAZON.NUMBER" }
+            {
+              "name": "stopNumber",
+              "type": "AMAZON.NUMBER"
+            }
           ],
           "samples": [
             "from stop {stopNumber}",
@@ -42,7 +45,10 @@
         {
           "name": "SetFavouriteStopIntent",
           "slots": [
-            { "name": "stopNumber", "type": "AMAZON.NUMBER" }
+            {
+              "name": "stopNumber",
+              "type": "AMAZON.NUMBER"
+            }
           ],
           "samples": [
             "to set my favourite stop to {stopNumber}",
@@ -79,13 +85,3484 @@
             "what is my favorite stop"
           ]
         },
-        { "name": "AMAZON.HelpIntent", "samples": [] },
-        { "name": "AMAZON.StopIntent", "samples": [] },
-        { "name": "AMAZON.CancelIntent", "samples": [] },
-        { "name": "AMAZON.FallbackIntent", "samples": [] },
-        { "name": "AMAZON.NavigateHomeIntent", "samples": [] }
+        {
+          "name": "ClearFavouriteStopIntent",
+          "slots": [],
+          "samples": [
+            "forget my favourite stop",
+            "unset my favourite stop",
+            "clear my favourite stop",
+            "forget my favorite stop",
+            "unset my favorite stop",
+            "clear my favorite stop",
+            "delete my favourite stop",
+            "remove my favourite stop",
+            "forget my stop",
+            "unset my stop",
+            "forget my favourite bus stop",
+            "unset my favourite bus stop",
+            "clear my favourite bus stop"
+          ]
+        },
+        {
+          "name": "ClearAllFavouritesIntent",
+          "slots": [],
+          "samples": [
+            "forget all my favourite stops",
+            "unset all my favourite stops",
+            "clear all my favourite stops",
+            "forget all my favorites",
+            "forget all my favourites",
+            "unset all my favourites",
+            "clear all my favourites",
+            "forget every favourite stop",
+            "unset every favourite stop",
+            "forget all favourites"
+          ]
+        },
+        {
+          "name": "NextLuasIntent",
+          "slots": [
+            {
+              "name": "luasStation",
+              "type": "LUAS_STATION"
+            },
+            {
+              "name": "luasDirection",
+              "type": "LUAS_DIRECTION"
+            }
+          ],
+          "samples": [
+            "or LUAS",
+            "or LUAS from {luasStation} {luasDirection}",
+            "or LUAS from {luasStation} towards {luasDirection}",
+            "or LUAS from {luasStation} toward {luasDirection}",
+            "or LUAS from {luasStation} to {luasDirection}",
+            "or LUAS from {luasStation}",
+            "or LUAS from my favourite stop",
+            "or LUAS from my stop",
+            "or LUAS for my stop",
+            "or Lewis",
+            "or Lewis from {luasStation} {luasDirection}",
+            "or Lewis from {luasStation} towards {luasDirection}",
+            "or Lewis from {luasStation} toward {luasDirection}",
+            "or Lewis from {luasStation} to {luasDirection}",
+            "or Lewis from {luasStation}",
+            "or Lewis from my favourite stop",
+            "or Lewis from my stop",
+            "or Lewis for my stop",
+            "or Louis",
+            "or Louis from {luasStation} {luasDirection}",
+            "or Louis from {luasStation} towards {luasDirection}",
+            "or Louis from {luasStation} toward {luasDirection}",
+            "or Louis from {luasStation} to {luasDirection}",
+            "or Louis from {luasStation}",
+            "or Louis from my favourite stop",
+            "or Louis from my stop",
+            "or Louis for my stop",
+            "or Lucas",
+            "or Lucas from {luasStation} {luasDirection}",
+            "or Lucas from {luasStation} towards {luasDirection}",
+            "or Lucas from {luasStation} toward {luasDirection}",
+            "or Lucas from {luasStation} to {luasDirection}",
+            "or Lucas from {luasStation}",
+            "or Lucas from my favourite stop",
+            "or Lucas from my stop",
+            "or Lucas for my stop",
+            "or loos",
+            "or loos from {luasStation} {luasDirection}",
+            "or loos from {luasStation} towards {luasDirection}",
+            "or loos from {luasStation} toward {luasDirection}",
+            "or loos from {luasStation} to {luasDirection}",
+            "or loos from {luasStation}",
+            "or loos from my favourite stop",
+            "or loos from my stop",
+            "or loos for my stop",
+            "{luasDirection}",
+            "going {luasDirection}",
+            "heading {luasDirection}",
+            "towards {luasDirection}",
+            "toward {luasDirection}",
+            "{luasDirection} towards {luasStation}",
+            "{luasDirection} toward {luasStation}"
+          ]
+        },
+        {
+          "name": "NextLuasQueryIntent",
+          "slots": [
+            {
+              "name": "luasQuery",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "or LUAS from {luasQuery}",
+            "or LUAS for {luasQuery}",
+            "or Lewis from {luasQuery}",
+            "or Lewis for {luasQuery}",
+            "or Louis from {luasQuery}",
+            "or Louis for {luasQuery}",
+            "or Lucas from {luasQuery}",
+            "or Lucas for {luasQuery}",
+            "or loos from {luasQuery}",
+            "or loos for {luasQuery}"
+          ]
+        },
+        {
+          "name": "SetFavouriteLuasIntent",
+          "slots": [
+            {
+              "name": "luasStation",
+              "type": "LUAS_STATION"
+            },
+            {
+              "name": "luasDirection",
+              "type": "LUAS_DIRECTION"
+            }
+          ],
+          "samples": [
+            "or LUAS to set my favourite stop to {luasStation} {luasDirection}",
+            "or LUAS to set my favourite stop to {luasStation}",
+            "or LUAS to set my favourite stop",
+            "or LUAS set my favourite stop to {luasStation} {luasDirection}",
+            "or LUAS set my favourite stop to {luasStation}",
+            "or LUAS set my favourite stop",
+            "or LUAS to set my favorite stop to {luasStation} {luasDirection}",
+            "or LUAS to set my favorite stop to {luasStation}",
+            "or LUAS to set my favorite stop",
+            "or LUAS set my favorite stop to {luasStation} {luasDirection}",
+            "or LUAS set my favorite stop to {luasStation}",
+            "or LUAS set my favorite stop",
+            "or LUAS change my favourite stop to {luasStation} {luasDirection}",
+            "or LUAS change my favourite stop to {luasStation}",
+            "or LUAS change my favorite stop to {luasStation} {luasDirection}",
+            "or LUAS change my favorite stop to {luasStation}",
+            "or Lewis to set my favourite stop to {luasStation} {luasDirection}",
+            "or Lewis to set my favourite stop to {luasStation}",
+            "or Lewis to set my favourite stop",
+            "or Lewis set my favourite stop to {luasStation} {luasDirection}",
+            "or Lewis set my favourite stop to {luasStation}",
+            "or Lewis set my favourite stop",
+            "or Lewis to set my favorite stop to {luasStation} {luasDirection}",
+            "or Lewis to set my favorite stop to {luasStation}",
+            "or Lewis to set my favorite stop",
+            "or Lewis set my favorite stop to {luasStation} {luasDirection}",
+            "or Lewis set my favorite stop to {luasStation}",
+            "or Lewis set my favorite stop",
+            "or Lewis change my favourite stop to {luasStation} {luasDirection}",
+            "or Lewis change my favourite stop to {luasStation}",
+            "or Lewis change my favorite stop to {luasStation} {luasDirection}",
+            "or Lewis change my favorite stop to {luasStation}",
+            "or Louis to set my favourite stop to {luasStation} {luasDirection}",
+            "or Louis to set my favourite stop to {luasStation}",
+            "or Louis to set my favourite stop",
+            "or Louis set my favourite stop to {luasStation} {luasDirection}",
+            "or Louis set my favourite stop to {luasStation}",
+            "or Louis set my favourite stop",
+            "or Louis to set my favorite stop to {luasStation} {luasDirection}",
+            "or Louis to set my favorite stop to {luasStation}",
+            "or Louis to set my favorite stop",
+            "or Louis set my favorite stop to {luasStation} {luasDirection}",
+            "or Louis set my favorite stop to {luasStation}",
+            "or Louis set my favorite stop",
+            "or Louis change my favourite stop to {luasStation} {luasDirection}",
+            "or Louis change my favourite stop to {luasStation}",
+            "or Louis change my favorite stop to {luasStation} {luasDirection}",
+            "or Louis change my favorite stop to {luasStation}",
+            "or Lucas to set my favourite stop to {luasStation} {luasDirection}",
+            "or Lucas to set my favourite stop to {luasStation}",
+            "or Lucas to set my favourite stop",
+            "or Lucas set my favourite stop to {luasStation} {luasDirection}",
+            "or Lucas set my favourite stop to {luasStation}",
+            "or Lucas set my favourite stop",
+            "or Lucas to set my favorite stop to {luasStation} {luasDirection}",
+            "or Lucas to set my favorite stop to {luasStation}",
+            "or Lucas to set my favorite stop",
+            "or Lucas set my favorite stop to {luasStation} {luasDirection}",
+            "or Lucas set my favorite stop to {luasStation}",
+            "or Lucas set my favorite stop",
+            "or Lucas change my favourite stop to {luasStation} {luasDirection}",
+            "or Lucas change my favourite stop to {luasStation}",
+            "or Lucas change my favorite stop to {luasStation} {luasDirection}",
+            "or Lucas change my favorite stop to {luasStation}",
+            "or loos to set my favourite stop to {luasStation} {luasDirection}",
+            "or loos to set my favourite stop to {luasStation}",
+            "or loos to set my favourite stop",
+            "or loos set my favourite stop to {luasStation} {luasDirection}",
+            "or loos set my favourite stop to {luasStation}",
+            "or loos set my favourite stop",
+            "or loos to set my favorite stop to {luasStation} {luasDirection}",
+            "or loos to set my favorite stop to {luasStation}",
+            "or loos to set my favorite stop",
+            "or loos set my favorite stop to {luasStation} {luasDirection}",
+            "or loos set my favorite stop to {luasStation}",
+            "or loos set my favorite stop",
+            "or loos change my favourite stop to {luasStation} {luasDirection}",
+            "or loos change my favourite stop to {luasStation}",
+            "or loos change my favorite stop to {luasStation} {luasDirection}",
+            "or loos change my favorite stop to {luasStation}",
+            "to set my favourite LUAS stop to {luasStation} {luasDirection}",
+            "to set my favourite LUAS stop to {luasStation}",
+            "to set my favourite LUAS stop",
+            "set my favourite LUAS stop to {luasStation} {luasDirection}",
+            "set my favourite LUAS stop to {luasStation}",
+            "set my favourite LUAS stop",
+            "to set my favorite LUAS stop to {luasStation} {luasDirection}",
+            "to set my favorite LUAS stop to {luasStation}",
+            "to set my favorite LUAS stop",
+            "set my favorite LUAS stop to {luasStation} {luasDirection}",
+            "set my favorite LUAS stop to {luasStation}",
+            "set my favorite LUAS stop",
+            "change my favourite LUAS stop to {luasStation} {luasDirection}",
+            "change my favorite LUAS stop to {luasStation} {luasDirection}",
+            "to set my favourite Lewis stop to {luasStation} {luasDirection}",
+            "to set my favourite Lewis stop to {luasStation}",
+            "to set my favourite Lewis stop",
+            "set my favourite Lewis stop to {luasStation} {luasDirection}",
+            "set my favourite Lewis stop to {luasStation}",
+            "set my favourite Lewis stop",
+            "to set my favorite Lewis stop to {luasStation} {luasDirection}",
+            "to set my favorite Lewis stop to {luasStation}",
+            "to set my favorite Lewis stop",
+            "set my favorite Lewis stop to {luasStation} {luasDirection}",
+            "set my favorite Lewis stop to {luasStation}",
+            "set my favorite Lewis stop",
+            "change my favourite Lewis stop to {luasStation} {luasDirection}",
+            "change my favorite Lewis stop to {luasStation} {luasDirection}",
+            "to set my favourite Louis stop to {luasStation} {luasDirection}",
+            "to set my favourite Louis stop to {luasStation}",
+            "to set my favourite Louis stop",
+            "set my favourite Louis stop to {luasStation} {luasDirection}",
+            "set my favourite Louis stop to {luasStation}",
+            "set my favourite Louis stop",
+            "to set my favorite Louis stop to {luasStation} {luasDirection}",
+            "to set my favorite Louis stop to {luasStation}",
+            "to set my favorite Louis stop",
+            "set my favorite Louis stop to {luasStation} {luasDirection}",
+            "set my favorite Louis stop to {luasStation}",
+            "set my favorite Louis stop",
+            "change my favourite Louis stop to {luasStation} {luasDirection}",
+            "change my favorite Louis stop to {luasStation} {luasDirection}",
+            "to set my favourite Lucas stop to {luasStation} {luasDirection}",
+            "to set my favourite Lucas stop to {luasStation}",
+            "to set my favourite Lucas stop",
+            "set my favourite Lucas stop to {luasStation} {luasDirection}",
+            "set my favourite Lucas stop to {luasStation}",
+            "set my favourite Lucas stop",
+            "to set my favorite Lucas stop to {luasStation} {luasDirection}",
+            "to set my favorite Lucas stop to {luasStation}",
+            "to set my favorite Lucas stop",
+            "set my favorite Lucas stop to {luasStation} {luasDirection}",
+            "set my favorite Lucas stop to {luasStation}",
+            "set my favorite Lucas stop",
+            "change my favourite Lucas stop to {luasStation} {luasDirection}",
+            "change my favorite Lucas stop to {luasStation} {luasDirection}",
+            "to set my favourite loos stop to {luasStation} {luasDirection}",
+            "to set my favourite loos stop to {luasStation}",
+            "to set my favourite loos stop",
+            "set my favourite loos stop to {luasStation} {luasDirection}",
+            "set my favourite loos stop to {luasStation}",
+            "set my favourite loos stop",
+            "to set my favorite loos stop to {luasStation} {luasDirection}",
+            "to set my favorite loos stop to {luasStation}",
+            "to set my favorite loos stop",
+            "set my favorite loos stop to {luasStation} {luasDirection}",
+            "set my favorite loos stop to {luasStation}",
+            "set my favorite loos stop",
+            "change my favourite loos stop to {luasStation} {luasDirection}",
+            "change my favorite loos stop to {luasStation} {luasDirection}",
+            "{luasStation} {luasDirection}",
+            "{luasStation}",
+            "{luasDirection}",
+            "going {luasDirection}",
+            "heading {luasDirection}",
+            "towards {luasDirection}",
+            "toward {luasDirection}"
+          ]
+        },
+        {
+          "name": "SetFavouriteLuasQueryIntent",
+          "slots": [
+            {
+              "name": "luasQuery",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "or LUAS to set my favourite stop to {luasQuery}",
+            "or LUAS set my favourite stop to {luasQuery}",
+            "or LUAS to set my favorite stop to {luasQuery}",
+            "or LUAS set my favorite stop to {luasQuery}",
+            "or Lewis to set my favourite stop to {luasQuery}",
+            "or Lewis set my favourite stop to {luasQuery}",
+            "or Lewis to set my favorite stop to {luasQuery}",
+            "or Lewis set my favorite stop to {luasQuery}",
+            "or Louis to set my favourite stop to {luasQuery}",
+            "or Louis set my favourite stop to {luasQuery}",
+            "or Louis to set my favorite stop to {luasQuery}",
+            "or Louis set my favorite stop to {luasQuery}",
+            "or Lucas to set my favourite stop to {luasQuery}",
+            "or Lucas set my favourite stop to {luasQuery}",
+            "or Lucas to set my favorite stop to {luasQuery}",
+            "or Lucas set my favorite stop to {luasQuery}",
+            "or loos to set my favourite stop to {luasQuery}",
+            "or loos set my favourite stop to {luasQuery}",
+            "or loos to set my favorite stop to {luasQuery}",
+            "or loos set my favorite stop to {luasQuery}",
+            "to set my favourite LUAS stop to {luasQuery}",
+            "set my favourite LUAS stop to {luasQuery}",
+            "to set my favorite LUAS stop to {luasQuery}",
+            "set my favorite LUAS stop to {luasQuery}",
+            "to set my favourite Lewis stop to {luasQuery}",
+            "set my favourite Lewis stop to {luasQuery}",
+            "to set my favorite Lewis stop to {luasQuery}",
+            "set my favorite Lewis stop to {luasQuery}",
+            "to set my favourite Louis stop to {luasQuery}",
+            "set my favourite Louis stop to {luasQuery}",
+            "to set my favorite Louis stop to {luasQuery}",
+            "set my favorite Louis stop to {luasQuery}",
+            "to set my favourite Lucas stop to {luasQuery}",
+            "set my favourite Lucas stop to {luasQuery}",
+            "to set my favorite Lucas stop to {luasQuery}",
+            "set my favorite Lucas stop to {luasQuery}",
+            "to set my favourite loos stop to {luasQuery}",
+            "set my favourite loos stop to {luasQuery}",
+            "to set my favorite loos stop to {luasQuery}",
+            "set my favorite loos stop to {luasQuery}"
+          ]
+        },
+        {
+          "name": "GetFavouriteLuasIntent",
+          "slots": [],
+          "samples": [
+            "or LUAS for my favourite stop",
+            "or LUAS what is my favourite stop",
+            "or LUAS what's my favourite stop",
+            "or LUAS for my favorite stop",
+            "or LUAS what is my favorite stop",
+            "or Lewis for my favourite stop",
+            "or Lewis what is my favourite stop",
+            "or Lewis what's my favourite stop",
+            "or Lewis for my favorite stop",
+            "or Lewis what is my favorite stop",
+            "or Louis for my favourite stop",
+            "or Louis what is my favourite stop",
+            "or Louis what's my favourite stop",
+            "or Louis for my favorite stop",
+            "or Louis what is my favorite stop",
+            "or Lucas for my favourite stop",
+            "or Lucas what is my favourite stop",
+            "or Lucas what's my favourite stop",
+            "or Lucas for my favorite stop",
+            "or Lucas what is my favorite stop",
+            "or loos for my favourite stop",
+            "or loos what is my favourite stop",
+            "or loos what's my favourite stop",
+            "or loos for my favorite stop",
+            "or loos what is my favorite stop",
+            "for my favourite LUAS stop",
+            "what is my favourite LUAS stop",
+            "what's my favourite LUAS stop",
+            "what is my favourite LUAS stop number",
+            "which LUAS stop is my favourite",
+            "for my favorite LUAS stop",
+            "what is my favorite LUAS stop",
+            "for my favourite Lewis stop",
+            "what is my favourite Lewis stop",
+            "what's my favourite Lewis stop",
+            "what is my favourite Lewis stop number",
+            "which Lewis stop is my favourite",
+            "for my favorite Lewis stop",
+            "what is my favorite Lewis stop",
+            "for my favourite Louis stop",
+            "what is my favourite Louis stop",
+            "what's my favourite Louis stop",
+            "what is my favourite Louis stop number",
+            "which Louis stop is my favourite",
+            "for my favorite Louis stop",
+            "what is my favorite Louis stop",
+            "for my favourite Lucas stop",
+            "what is my favourite Lucas stop",
+            "what's my favourite Lucas stop",
+            "what is my favourite Lucas stop number",
+            "which Lucas stop is my favourite",
+            "for my favorite Lucas stop",
+            "what is my favorite Lucas stop",
+            "for my favourite loos stop",
+            "what is my favourite loos stop",
+            "what's my favourite loos stop",
+            "what is my favourite loos stop number",
+            "which loos stop is my favourite",
+            "for my favorite loos stop",
+            "what is my favorite loos stop"
+          ]
+        },
+        {
+          "name": "ClearFavouriteLuasIntent",
+          "slots": [],
+          "samples": [
+            "or LUAS forget my favourite stop",
+            "or LUAS unset my favourite stop",
+            "or LUAS clear my favourite stop",
+            "or LUAS forget my favorite stop",
+            "or LUAS unset my favorite stop",
+            "or LUAS clear my favorite stop",
+            "or LUAS delete my favourite stop",
+            "or LUAS remove my favourite stop",
+            "or LUAS forget my stop",
+            "or LUAS unset my stop",
+            "or Lewis forget my favourite stop",
+            "or Lewis unset my favourite stop",
+            "or Lewis clear my favourite stop",
+            "or Lewis forget my favorite stop",
+            "or Lewis unset my favorite stop",
+            "or Lewis clear my favorite stop",
+            "or Lewis delete my favourite stop",
+            "or Lewis remove my favourite stop",
+            "or Lewis forget my stop",
+            "or Lewis unset my stop",
+            "or Louis forget my favourite stop",
+            "or Louis unset my favourite stop",
+            "or Louis clear my favourite stop",
+            "or Louis forget my favorite stop",
+            "or Louis unset my favorite stop",
+            "or Louis clear my favorite stop",
+            "or Louis delete my favourite stop",
+            "or Louis remove my favourite stop",
+            "or Louis forget my stop",
+            "or Louis unset my stop",
+            "or Lucas forget my favourite stop",
+            "or Lucas unset my favourite stop",
+            "or Lucas clear my favourite stop",
+            "or Lucas forget my favorite stop",
+            "or Lucas unset my favorite stop",
+            "or Lucas clear my favorite stop",
+            "or Lucas delete my favourite stop",
+            "or Lucas remove my favourite stop",
+            "or Lucas forget my stop",
+            "or Lucas unset my stop",
+            "or loos forget my favourite stop",
+            "or loos unset my favourite stop",
+            "or loos clear my favourite stop",
+            "or loos forget my favorite stop",
+            "or loos unset my favorite stop",
+            "or loos clear my favorite stop",
+            "or loos delete my favourite stop",
+            "or loos remove my favourite stop",
+            "or loos forget my stop",
+            "or loos unset my stop",
+            "forget my favourite LUAS stop",
+            "unset my favourite LUAS stop",
+            "clear my favourite LUAS stop",
+            "forget my favorite LUAS stop",
+            "unset my favorite LUAS stop",
+            "clear my favorite LUAS stop",
+            "delete my favourite LUAS stop",
+            "remove my favourite LUAS stop",
+            "forget my favourite Lewis stop",
+            "unset my favourite Lewis stop",
+            "clear my favourite Lewis stop",
+            "forget my favorite Lewis stop",
+            "unset my favorite Lewis stop",
+            "clear my favorite Lewis stop",
+            "delete my favourite Lewis stop",
+            "remove my favourite Lewis stop",
+            "forget my favourite Louis stop",
+            "unset my favourite Louis stop",
+            "clear my favourite Louis stop",
+            "forget my favorite Louis stop",
+            "unset my favorite Louis stop",
+            "clear my favorite Louis stop",
+            "delete my favourite Louis stop",
+            "remove my favourite Louis stop",
+            "forget my favourite Lucas stop",
+            "unset my favourite Lucas stop",
+            "clear my favourite Lucas stop",
+            "forget my favorite Lucas stop",
+            "unset my favorite Lucas stop",
+            "clear my favorite Lucas stop",
+            "delete my favourite Lucas stop",
+            "remove my favourite Lucas stop",
+            "forget my favourite loos stop",
+            "unset my favourite loos stop",
+            "clear my favourite loos stop",
+            "forget my favorite loos stop",
+            "unset my favorite loos stop",
+            "clear my favorite loos stop",
+            "delete my favourite loos stop",
+            "remove my favourite loos stop"
+          ]
+        },
+        {
+          "name": "NextDartIntent",
+          "slots": [
+            {
+              "name": "dartStation",
+              "type": "DART_STATION"
+            },
+            {
+              "name": "dartDirection",
+              "type": "DART_DIRECTION"
+            }
+          ],
+          "samples": [
+            "or Dart",
+            "or Dart from {dartStation} {dartDirection}",
+            "or Dart from {dartStation} towards {dartDirection}",
+            "or Dart from {dartStation} toward {dartDirection}",
+            "or Dart from {dartStation} to {dartDirection}",
+            "or Dart from {dartStation}",
+            "or Dart from my favourite stop",
+            "or Dart from my stop",
+            "or Dart for my stop",
+            "{dartDirection}",
+            "going {dartDirection}",
+            "heading {dartDirection}",
+            "towards {dartDirection}",
+            "toward {dartDirection}",
+            "{dartDirection} towards {dartStation}",
+            "{dartDirection} toward {dartStation}"
+          ]
+        },
+        {
+          "name": "NextDartQueryIntent",
+          "slots": [
+            {
+              "name": "dartQuery",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "or Dart from {dartQuery}",
+            "or Dart for {dartQuery}"
+          ]
+        },
+        {
+          "name": "SetFavouriteDartIntent",
+          "slots": [
+            {
+              "name": "dartStation",
+              "type": "DART_STATION"
+            },
+            {
+              "name": "dartDirection",
+              "type": "DART_DIRECTION"
+            }
+          ],
+          "samples": [
+            "or Dart to set my favourite stop to {dartStation} {dartDirection}",
+            "or Dart to set my favourite stop to {dartStation}",
+            "or Dart to set my favourite stop",
+            "or Dart set my favourite stop to {dartStation} {dartDirection}",
+            "or Dart set my favourite stop to {dartStation}",
+            "or Dart set my favourite stop",
+            "or Dart to set my favorite stop to {dartStation} {dartDirection}",
+            "or Dart to set my favorite stop to {dartStation}",
+            "or Dart to set my favorite stop",
+            "or Dart set my favorite stop to {dartStation} {dartDirection}",
+            "or Dart set my favorite stop to {dartStation}",
+            "or Dart set my favorite stop",
+            "or Dart change my favourite stop to {dartStation} {dartDirection}",
+            "or Dart change my favourite stop to {dartStation}",
+            "or Dart change my favorite stop to {dartStation} {dartDirection}",
+            "or Dart change my favorite stop to {dartStation}",
+            "to set my favourite Dart stop to {dartStation} {dartDirection}",
+            "to set my favourite Dart stop to {dartStation}",
+            "to set my favourite Dart stop",
+            "set my favourite Dart stop to {dartStation} {dartDirection}",
+            "set my favourite Dart stop to {dartStation}",
+            "set my favourite Dart stop",
+            "to set my favorite Dart stop to {dartStation} {dartDirection}",
+            "to set my favorite Dart stop to {dartStation}",
+            "to set my favorite Dart stop",
+            "set my favorite Dart stop to {dartStation} {dartDirection}",
+            "set my favorite Dart stop to {dartStation}",
+            "set my favorite Dart stop",
+            "change my favourite Dart stop to {dartStation} {dartDirection}",
+            "change my favorite Dart stop to {dartStation} {dartDirection}",
+            "{dartStation} {dartDirection}",
+            "{dartStation}",
+            "{dartDirection}",
+            "going {dartDirection}",
+            "heading {dartDirection}",
+            "towards {dartDirection}",
+            "toward {dartDirection}"
+          ]
+        },
+        {
+          "name": "SetFavouriteDartQueryIntent",
+          "slots": [
+            {
+              "name": "dartQuery",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "or Dart to set my favourite stop to {dartQuery}",
+            "or Dart set my favourite stop to {dartQuery}",
+            "or Dart to set my favorite stop to {dartQuery}",
+            "or Dart set my favorite stop to {dartQuery}",
+            "to set my favourite Dart stop to {dartQuery}",
+            "set my favourite Dart stop to {dartQuery}",
+            "to set my favorite Dart stop to {dartQuery}",
+            "set my favorite Dart stop to {dartQuery}"
+          ]
+        },
+        {
+          "name": "GetFavouriteDartIntent",
+          "slots": [],
+          "samples": [
+            "or Dart for my favourite stop",
+            "or Dart what is my favourite stop",
+            "or Dart what's my favourite stop",
+            "or Dart for my favorite stop",
+            "or Dart what is my favorite stop",
+            "for my favourite Dart stop",
+            "what is my favourite Dart stop",
+            "what's my favourite Dart stop",
+            "what is my favourite Dart stop number",
+            "which Dart stop is my favourite",
+            "for my favorite Dart stop",
+            "what is my favorite Dart stop"
+          ]
+        },
+        {
+          "name": "ClearFavouriteDartIntent",
+          "slots": [],
+          "samples": [
+            "or Dart forget my favourite stop",
+            "or Dart unset my favourite stop",
+            "or Dart clear my favourite stop",
+            "or Dart forget my favorite stop",
+            "or Dart unset my favorite stop",
+            "or Dart clear my favorite stop",
+            "or Dart delete my favourite stop",
+            "or Dart remove my favourite stop",
+            "or Dart forget my stop",
+            "or Dart unset my stop",
+            "forget my favourite Dart stop",
+            "unset my favourite Dart stop",
+            "clear my favourite Dart stop",
+            "forget my favorite Dart stop",
+            "unset my favorite Dart stop",
+            "clear my favorite Dart stop",
+            "delete my favourite Dart stop",
+            "remove my favourite Dart stop"
+          ]
+        },
+        {
+          "name": "NextLocalTrainIntent",
+          "slots": [
+            {
+              "name": "trainStation",
+              "type": "LOCAL_TRAIN_STATION"
+            },
+            {
+              "name": "trainDirection",
+              "type": "LOCAL_TRAIN_DIRECTION"
+            }
+          ],
+          "samples": [
+            "or local train",
+            "or local train from {trainStation} {trainDirection}",
+            "or local train from {trainStation} towards {trainDirection}",
+            "or local train from {trainStation} toward {trainDirection}",
+            "or local train from {trainStation} to {trainDirection}",
+            "or local train from {trainStation}",
+            "or local train from my favourite stop",
+            "or local train from my stop",
+            "or local train for my stop",
+            "{trainDirection}",
+            "going {trainDirection}",
+            "heading {trainDirection}",
+            "towards {trainDirection}",
+            "toward {trainDirection}",
+            "{trainDirection} towards {trainStation}",
+            "{trainDirection} toward {trainStation}"
+          ]
+        },
+        {
+          "name": "NextLocalTrainQueryIntent",
+          "slots": [
+            {
+              "name": "trainQuery",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "or local train from {trainQuery}",
+            "or local train for {trainQuery}"
+          ]
+        },
+        {
+          "name": "SetFavouriteLocalTrainIntent",
+          "slots": [
+            {
+              "name": "trainStation",
+              "type": "LOCAL_TRAIN_STATION"
+            },
+            {
+              "name": "trainDirection",
+              "type": "LOCAL_TRAIN_DIRECTION"
+            }
+          ],
+          "samples": [
+            "or local train to set my favourite stop to {trainStation} {trainDirection}",
+            "or local train to set my favourite stop to {trainStation}",
+            "or local train to set my favourite stop",
+            "or local train set my favourite stop to {trainStation} {trainDirection}",
+            "or local train set my favourite stop to {trainStation}",
+            "or local train set my favourite stop",
+            "or local train to set my favorite stop to {trainStation} {trainDirection}",
+            "or local train to set my favorite stop to {trainStation}",
+            "or local train to set my favorite stop",
+            "or local train set my favorite stop to {trainStation} {trainDirection}",
+            "or local train set my favorite stop to {trainStation}",
+            "or local train set my favorite stop",
+            "or local train change my favourite stop to {trainStation} {trainDirection}",
+            "or local train change my favourite stop to {trainStation}",
+            "or local train change my favorite stop to {trainStation} {trainDirection}",
+            "or local train change my favorite stop to {trainStation}",
+            "to set my favourite local train stop to {trainStation} {trainDirection}",
+            "to set my favourite local train stop to {trainStation}",
+            "to set my favourite local train stop",
+            "set my favourite local train stop to {trainStation} {trainDirection}",
+            "set my favourite local train stop to {trainStation}",
+            "set my favourite local train stop",
+            "to set my favorite local train stop to {trainStation} {trainDirection}",
+            "to set my favorite local train stop to {trainStation}",
+            "to set my favorite local train stop",
+            "set my favorite local train stop to {trainStation} {trainDirection}",
+            "set my favorite local train stop to {trainStation}",
+            "set my favorite local train stop",
+            "change my favourite local train stop to {trainStation} {trainDirection}",
+            "change my favorite local train stop to {trainStation} {trainDirection}",
+            "{trainStation} {trainDirection}",
+            "{trainStation}",
+            "{trainDirection}",
+            "going {trainDirection}",
+            "heading {trainDirection}",
+            "towards {trainDirection}",
+            "toward {trainDirection}"
+          ]
+        },
+        {
+          "name": "SetFavouriteLocalTrainQueryIntent",
+          "slots": [
+            {
+              "name": "trainQuery",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "or local train to set my favourite stop to {trainQuery}",
+            "or local train set my favourite stop to {trainQuery}",
+            "or local train to set my favorite stop to {trainQuery}",
+            "or local train set my favorite stop to {trainQuery}",
+            "to set my favourite local train stop to {trainQuery}",
+            "set my favourite local train stop to {trainQuery}",
+            "to set my favorite local train stop to {trainQuery}",
+            "set my favorite local train stop to {trainQuery}"
+          ]
+        },
+        {
+          "name": "GetFavouriteLocalTrainIntent",
+          "slots": [],
+          "samples": [
+            "or local train for my favourite stop",
+            "or local train what is my favourite stop",
+            "or local train what's my favourite stop",
+            "or local train for my favorite stop",
+            "or local train what is my favorite stop",
+            "for my favourite local train stop",
+            "what is my favourite local train stop",
+            "what's my favourite local train stop",
+            "what is my favourite local train stop number",
+            "which local train stop is my favourite",
+            "for my favorite local train stop",
+            "what is my favorite local train stop"
+          ]
+        },
+        {
+          "name": "ClearFavouriteLocalTrainIntent",
+          "slots": [],
+          "samples": [
+            "or local train forget my favourite stop",
+            "or local train unset my favourite stop",
+            "or local train clear my favourite stop",
+            "or local train forget my favorite stop",
+            "or local train unset my favorite stop",
+            "or local train clear my favorite stop",
+            "or local train delete my favourite stop",
+            "or local train remove my favourite stop",
+            "or local train forget my stop",
+            "or local train unset my stop",
+            "forget my favourite local train stop",
+            "unset my favourite local train stop",
+            "clear my favourite local train stop",
+            "forget my favorite local train stop",
+            "unset my favorite local train stop",
+            "clear my favorite local train stop",
+            "delete my favourite local train stop",
+            "remove my favourite local train stop"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        }
       ],
-      "types": []
+      "types": [
+        {
+          "name": "LUAS_STATION",
+          "values": [
+            {
+              "name": {
+                "value": "Abbey Street",
+                "synonyms": [
+                  "Abbey St.",
+                  "abbey",
+                  "abbey st"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Balally",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Ballyogan Wood",
+                "synonyms": [
+                  "Ballyogan",
+                  "ballyogan"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Beechwood",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Belgard",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Blackhorse",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Bluebell",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Brides Glen",
+                "synonyms": [
+                  "bridesglen",
+                  "bride s glen"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Broadstone DIT",
+                "synonyms": [
+                  "Broadstone"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Broombridge",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Busaras",
+                "synonyms": [
+                  "Busáras",
+                  "bus aras"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Cabra",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Carrickmines",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Central Park",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Charlemont",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Cheeverstown",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Cherrywood",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Citywest Campus",
+                "synonyms": [
+                  "Citywest",
+                  "citywest"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Connolly",
+                "synonyms": [
+                  "connolly station"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Cookstown",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Cowper",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Dawson",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Dominick",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Drimnagh",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Dundrum",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Fatima",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Fettercairn",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Fortunestown",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Four Courts",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "George's Dock",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Glencairn",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Goldenbridge",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Grangegorman",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Harcourt",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Heuston",
+                "synonyms": [
+                  "heuston station"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "James's",
+                "synonyms": [
+                  "james",
+                  "jamess",
+                  "st jamess",
+                  "james s"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Jervis",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Kilmacud",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Kingswood",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Kylemore",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Laughanstown",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Leopardstown Valley",
+                "synonyms": [
+                  "Leopardstown",
+                  "leopardstown"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Marlborough",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Mayor Square",
+                "synonyms": [
+                  "mayors square",
+                  "nci"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Milltown",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Museum",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "O'Connell GPO",
+                "synonyms": [
+                  "O'Connell - GPO",
+                  "the gpo",
+                  "oconnell street",
+                  "o connell street",
+                  "o connell",
+                  "oconnell"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "O'Connell Upper",
+                "synonyms": [
+                  "O'Connell Upr."
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Parnell",
+                "synonyms": [
+                  "parnell square"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Phibsborough",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Ranelagh",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Red Cow",
+                "synonyms": [
+                  "the red cow"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Rialto",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Saggart",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Sandyford",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Smithfield",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Spencer Dock",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "St Stephen's Green",
+                "synonyms": [
+                  "St. Stephen's Green",
+                  "stephens green",
+                  "stephen s green",
+                  "st stephens green",
+                  "the green"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Stillorgan",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Suir Road",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Tallaght",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Tallaght Hospital",
+                "synonyms": [
+                  "Hospital",
+                  "hospital",
+                  "the hospital"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "The Gallops",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "The Point",
+                "synonyms": [
+                  "point village",
+                  "three arena",
+                  "3arena"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Trinity",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Westmoreland",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Windy Arbour",
+                "synonyms": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "LUAS_DIRECTION",
+          "values": [
+            {
+              "name": {
+                "value": "northbound",
+                "synonyms": [
+                  "north",
+                  "north bound",
+                  "going north",
+                  "heading north",
+                  "going northbound",
+                  "heading northbound",
+                  "northward",
+                  "northwards",
+                  "to the north",
+                  "nortbound",
+                  "norbound"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "southbound",
+                "synonyms": [
+                  "south",
+                  "south bound",
+                  "going south",
+                  "heading south",
+                  "going southbound",
+                  "heading southbound",
+                  "southward",
+                  "southwards",
+                  "to the south"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "eastbound",
+                "synonyms": [
+                  "east",
+                  "east bound",
+                  "going east",
+                  "heading east",
+                  "going eastbound",
+                  "heading eastbound",
+                  "eastward",
+                  "eastwards",
+                  "to the east"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "westbound",
+                "synonyms": [
+                  "west",
+                  "west bound",
+                  "going west",
+                  "heading west",
+                  "going westbound",
+                  "heading westbound",
+                  "westward",
+                  "westwards",
+                  "to the west"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "the city",
+                "synonyms": [
+                  "city",
+                  "city centre",
+                  "city center",
+                  "into town",
+                  "town",
+                  "towards the city",
+                  "toward the city",
+                  "to the city"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Broombridge",
+                "synonyms": [
+                  "towards Broombridge",
+                  "toward Broombridge",
+                  "to Broombridge"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Brides Glen",
+                "synonyms": [
+                  "towards Brides Glen",
+                  "toward Brides Glen",
+                  "to Brides Glen"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Tallaght",
+                "synonyms": [
+                  "towards Tallaght",
+                  "toward Tallaght",
+                  "to Tallaght"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Saggart",
+                "synonyms": [
+                  "towards Saggart",
+                  "toward Saggart",
+                  "to Saggart"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Connolly",
+                "synonyms": [
+                  "towards Connolly",
+                  "toward Connolly",
+                  "to Connolly"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "The Point",
+                "synonyms": [
+                  "towards The Point",
+                  "toward The Point",
+                  "to The Point"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Parnell",
+                "synonyms": [
+                  "towards Parnell",
+                  "toward Parnell",
+                  "to Parnell"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Sandyford",
+                "synonyms": [
+                  "towards Sandyford",
+                  "toward Sandyford",
+                  "to Sandyford"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Heuston",
+                "synonyms": [
+                  "towards Heuston",
+                  "toward Heuston",
+                  "to Heuston"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Red Cow",
+                "synonyms": [
+                  "towards Red Cow",
+                  "toward Red Cow",
+                  "to Red Cow"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Belgard",
+                "synonyms": [
+                  "towards Belgard",
+                  "toward Belgard",
+                  "to Belgard"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Kingswood",
+                "synonyms": [
+                  "towards Kingswood",
+                  "toward Kingswood",
+                  "to Kingswood"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DART_STATION",
+          "values": [
+            {
+              "name": {
+                "value": "Bayside",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Blackrock",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Booterstown",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Bray",
+                "synonyms": [
+                  "Bray (Daly)",
+                  "Bray Daly",
+                  "bray daly",
+                  "daly"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Clongriffin",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Clontarf Road",
+                "synonyms": [
+                  "clontarf"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Connolly",
+                "synonyms": [
+                  "connolly station",
+                  "dublin connolly"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Dalkey",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Dun Laoghaire",
+                "synonyms": [
+                  "Dun Laoghaire (Mallin)",
+                  "Dun Laoghaire Mallin",
+                  "dunleary",
+                  "dun laoire",
+                  "mallin"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Glenageary",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Grand Canal Dock",
+                "synonyms": [
+                  "grand canal",
+                  "gcd"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Greystones",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Harmonstown",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Howth",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Howth Junction",
+                "synonyms": [
+                  "Howth Junction and Donaghmede",
+                  "donaghmede"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Kilbarrack",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Killester",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Killiney",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Lansdowne",
+                "synonyms": [
+                  "Lansdowne Road",
+                  "lansdowne rd",
+                  "aviva",
+                  "aviva stadium"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Malahide",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Pearse",
+                "synonyms": [
+                  "Dublin Pearse",
+                  "pearse station",
+                  "dublin pearse",
+                  "pearse street",
+                  "westland row"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Portmarnock",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Raheny",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Salthill",
+                "synonyms": [
+                  "Salthill and Monkstown",
+                  "monkstown"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Sandycove",
+                "synonyms": [
+                  "Sandycove and Glasthule",
+                  "glasthule"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Sandymount",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Seapoint",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Shankill",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Sutton",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Sydney Parade",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Tara Street",
+                "synonyms": [
+                  "tara",
+                  "tara st"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Woodbrook",
+                "synonyms": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "DART_DIRECTION",
+          "values": [
+            {
+              "name": {
+                "value": "eastbound",
+                "synonyms": [
+                  "east",
+                  "east bound",
+                  "going east",
+                  "heading east",
+                  "going eastbound",
+                  "heading eastbound",
+                  "eastward",
+                  "eastwards",
+                  "to the east"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "westbound",
+                "synonyms": [
+                  "west",
+                  "west bound",
+                  "going west",
+                  "heading west",
+                  "going westbound",
+                  "heading westbound",
+                  "westward",
+                  "westwards",
+                  "to the west"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "northbound",
+                "synonyms": [
+                  "north",
+                  "north bound",
+                  "going north",
+                  "heading north",
+                  "going northbound",
+                  "heading northbound",
+                  "northward",
+                  "northwards",
+                  "to the north",
+                  "nortbound",
+                  "norbound"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "southbound",
+                "synonyms": [
+                  "south",
+                  "south bound",
+                  "going south",
+                  "heading south",
+                  "going southbound",
+                  "heading southbound",
+                  "southward",
+                  "southwards",
+                  "to the south"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "the city",
+                "synonyms": [
+                  "city",
+                  "city centre",
+                  "city center",
+                  "into town",
+                  "town",
+                  "towards the city",
+                  "toward the city",
+                  "to the city"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Howth",
+                "synonyms": [
+                  "towards Howth",
+                  "toward Howth",
+                  "to Howth"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Malahide",
+                "synonyms": [
+                  "towards Malahide",
+                  "toward Malahide",
+                  "to Malahide"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Bray",
+                "synonyms": [
+                  "towards Bray",
+                  "toward Bray",
+                  "to Bray"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Greystones",
+                "synonyms": [
+                  "towards Greystones",
+                  "toward Greystones",
+                  "to Greystones"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Howth Junction",
+                "synonyms": [
+                  "towards Howth Junction",
+                  "toward Howth Junction",
+                  "to Howth Junction"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Grand Canal Dock",
+                "synonyms": [
+                  "towards Grand Canal Dock",
+                  "toward Grand Canal Dock",
+                  "to Grand Canal Dock"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Dun Laoghaire",
+                "synonyms": [
+                  "towards Dun Laoghaire",
+                  "toward Dun Laoghaire",
+                  "to Dun Laoghaire"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Connolly",
+                "synonyms": [
+                  "towards Connolly",
+                  "toward Connolly",
+                  "to Connolly"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Pearse",
+                "synonyms": [
+                  "towards Pearse",
+                  "toward Pearse",
+                  "to Pearse"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Lansdowne Road",
+                "synonyms": [
+                  "towards Lansdowne Road",
+                  "toward Lansdowne Road",
+                  "to Lansdowne Road"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "LOCAL_TRAIN_STATION",
+          "values": [
+            {
+              "name": {
+                "value": "Adamstown",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Arklow",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Ashtown",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Balbriggan",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Ballymote",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Blackrock",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Boyle",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Bray",
+                "synonyms": [
+                  "Bray (Daly)",
+                  "Bray Daly",
+                  "bray daly",
+                  "daly"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Broombridge",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Cahir",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Carrick-on-Shannon",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Carrick-on-Suir",
+                "synonyms": [
+                  "carrick on suir"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Carrigaloe",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Carrigtwohill",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Castleknock",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Clondalkin",
+                "synonyms": [
+                  "Clondalkin Fonthill",
+                  "fonthill"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Clongriffin",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Clonmel",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Clonsilla",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Cobh",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Collooney",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Connolly",
+                "synonyms": [
+                  "connolly station",
+                  "dublin connolly"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Coolmine",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Docklands",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Donabate",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Drogheda",
+                "synonyms": [
+                  "Drogheda (MacBride)",
+                  "macbride"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Dromod",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Drumcondra",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Dun Laoghaire",
+                "synonyms": [
+                  "Dun Laoghaire (Mallin)",
+                  "Dun Laoghaire Mallin",
+                  "dunleary",
+                  "dun laoire",
+                  "mallin"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Dunboyne",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Dundalk",
+                "synonyms": [
+                  "Dundalk (Clarke)",
+                  "clarke"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Edgeworthstown",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Enfield Stn",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Enniscorthy",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Fota",
+                "synonyms": [
+                  "fota wildlife park"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Glounthaune",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Gorey",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Gormanston Stn",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Grand Canal Dock",
+                "synonyms": [
+                  "grand canal",
+                  "gcd"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Greystones",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Hansfield",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Hazelhatch",
+                "synonyms": [
+                  "Hazelhatch and Celbridge",
+                  "celbridge"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Heuston",
+                "synonyms": [
+                  "Dublin Heuston",
+                  "heuston station",
+                  "dublin heuston",
+                  "kingsbridge"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Howth Junction",
+                "synonyms": [
+                  "Howth Junction and Donaghmede",
+                  "donaghmede"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Kent",
+                "synonyms": [
+                  "Cork (Kent)",
+                  "Cork",
+                  "Cork Kent",
+                  "kent station",
+                  "cork kent",
+                  "cork station"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Kilcock",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Kilcoole",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Kildare",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Kishoge",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Lansdowne",
+                "synonyms": [
+                  "Lansdowne Road",
+                  "lansdowne rd",
+                  "aviva",
+                  "aviva stadium"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Laytown Station",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Leixlip(Confey)",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Leixlip(Louisa Bridge)",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Limerick Junction",
+                "synonyms": [
+                  "limerick jct"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Little Island",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Longford",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "M3 Parkway",
+                "synonyms": [
+                  "m3"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Malahide",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Mallow",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Maynooth",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Midleton",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Monasterevin",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Mullingar",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Navan Road Parkway",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Newbridge",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Park West",
+                "synonyms": [
+                  "Park West and Cherry Orchard",
+                  "cherry orchard"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Pearse",
+                "synonyms": [
+                  "Dublin Pearse",
+                  "pearse station",
+                  "dublin pearse",
+                  "pearse street",
+                  "westland row"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Pelletstown",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Portarlington",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Portlaoise",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Portmarnock",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Rathdrum",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Rosslare Europort",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Rosslare Strand",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Rush and Lusk",
+                "synonyms": [
+                  "lusk"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Rushbrooke",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Sallins",
+                "synonyms": [
+                  "Sallins and Naas",
+                  "naas"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Skerries",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Sligo (MacDiarmada)",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Sydney Parade",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Tara Street",
+                "synonyms": [
+                  "tara",
+                  "tara st"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Tipperary",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Waterford (Plunkett)",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Wexford (O Hanrahan)",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Wicklow",
+                "synonyms": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "LOCAL_TRAIN_DIRECTION",
+          "values": [
+            {
+              "name": {
+                "value": "northbound",
+                "synonyms": [
+                  "north",
+                  "north bound",
+                  "going north",
+                  "heading north",
+                  "going northbound",
+                  "heading northbound",
+                  "northward",
+                  "northwards",
+                  "to the north",
+                  "nortbound",
+                  "norbound"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "southbound",
+                "synonyms": [
+                  "south",
+                  "south bound",
+                  "going south",
+                  "heading south",
+                  "going southbound",
+                  "heading southbound",
+                  "southward",
+                  "southwards",
+                  "to the south"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "eastbound",
+                "synonyms": [
+                  "east",
+                  "east bound",
+                  "going east",
+                  "heading east",
+                  "going eastbound",
+                  "heading eastbound",
+                  "eastward",
+                  "eastwards",
+                  "to the east"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "westbound",
+                "synonyms": [
+                  "west",
+                  "west bound",
+                  "going west",
+                  "heading west",
+                  "going westbound",
+                  "heading westbound",
+                  "westward",
+                  "westwards",
+                  "to the west"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "the city",
+                "synonyms": [
+                  "city",
+                  "city centre",
+                  "city center",
+                  "into town",
+                  "town",
+                  "towards the city",
+                  "toward the city",
+                  "to the city"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Dundalk",
+                "synonyms": [
+                  "towards Dundalk",
+                  "toward Dundalk",
+                  "to Dundalk"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Drogheda",
+                "synonyms": [
+                  "towards Drogheda",
+                  "toward Drogheda",
+                  "to Drogheda"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Maynooth",
+                "synonyms": [
+                  "towards Maynooth",
+                  "toward Maynooth",
+                  "to Maynooth"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Longford",
+                "synonyms": [
+                  "towards Longford",
+                  "toward Longford",
+                  "to Longford"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "M3 Parkway",
+                "synonyms": [
+                  "towards M3 Parkway",
+                  "toward M3 Parkway",
+                  "to M3 Parkway"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Portlaoise",
+                "synonyms": [
+                  "towards Portlaoise",
+                  "toward Portlaoise",
+                  "to Portlaoise"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Hazelhatch",
+                "synonyms": [
+                  "towards Hazelhatch",
+                  "toward Hazelhatch",
+                  "to Hazelhatch"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Gorey",
+                "synonyms": [
+                  "towards Gorey",
+                  "toward Gorey",
+                  "to Gorey"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Cobh",
+                "synonyms": [
+                  "towards Cobh",
+                  "toward Cobh",
+                  "to Cobh"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Midleton",
+                "synonyms": [
+                  "towards Midleton",
+                  "toward Midleton",
+                  "to Midleton"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Mallow",
+                "synonyms": [
+                  "towards Mallow",
+                  "toward Mallow",
+                  "to Mallow"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Limerick Junction",
+                "synonyms": [
+                  "towards Limerick Junction",
+                  "toward Limerick Junction",
+                  "to Limerick Junction"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Waterford",
+                "synonyms": [
+                  "towards Waterford",
+                  "toward Waterford",
+                  "to Waterford"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Heuston",
+                "synonyms": [
+                  "towards Heuston",
+                  "toward Heuston",
+                  "to Heuston"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Connolly",
+                "synonyms": [
+                  "towards Connolly",
+                  "toward Connolly",
+                  "to Connolly"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Pearse",
+                "synonyms": [
+                  "towards Pearse",
+                  "toward Pearse",
+                  "to Pearse"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Kent",
+                "synonyms": [
+                  "towards Kent",
+                  "toward Kent",
+                  "to Kent"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Bray",
+                "synonyms": [
+                  "towards Bray",
+                  "toward Bray",
+                  "to Bray"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Greystones",
+                "synonyms": [
+                  "towards Greystones",
+                  "toward Greystones",
+                  "to Greystones"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Adamstown",
+                "synonyms": [
+                  "towards Adamstown",
+                  "toward Adamstown",
+                  "to Adamstown"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Grand Canal Dock",
+                "synonyms": [
+                  "towards Grand Canal Dock",
+                  "toward Grand Canal Dock",
+                  "to Grand Canal Dock"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Newbridge",
+                "synonyms": [
+                  "towards Newbridge",
+                  "toward Newbridge",
+                  "to Newbridge"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Arklow",
+                "synonyms": [
+                  "towards Arklow",
+                  "toward Arklow",
+                  "to Arklow"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Wicklow",
+                "synonyms": [
+                  "towards Wicklow",
+                  "toward Wicklow",
+                  "to Wicklow"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Ashtown",
+                "synonyms": [
+                  "towards Ashtown",
+                  "toward Ashtown",
+                  "to Ashtown"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Docklands",
+                "synonyms": [
+                  "towards Docklands",
+                  "toward Docklands",
+                  "to Docklands"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Mullingar",
+                "synonyms": [
+                  "towards Mullingar",
+                  "toward Mullingar",
+                  "to Mullingar"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Dun Laoghaire",
+                "synonyms": [
+                  "towards Dun Laoghaire",
+                  "toward Dun Laoghaire",
+                  "to Dun Laoghaire"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Balbriggan",
+                "synonyms": [
+                  "towards Balbriggan",
+                  "toward Balbriggan",
+                  "to Balbriggan"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Ballymote",
+                "synonyms": [
+                  "towards Ballymote",
+                  "toward Ballymote",
+                  "to Ballymote"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Dromod",
+                "synonyms": [
+                  "towards Dromod",
+                  "toward Dromod",
+                  "to Dromod"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Blackrock",
+                "synonyms": [
+                  "towards Blackrock",
+                  "toward Blackrock",
+                  "to Blackrock"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Boyle",
+                "synonyms": [
+                  "towards Boyle",
+                  "toward Boyle",
+                  "to Boyle"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Broombridge",
+                "synonyms": [
+                  "towards Broombridge",
+                  "toward Broombridge",
+                  "to Broombridge"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Cahir",
+                "synonyms": [
+                  "towards Cahir",
+                  "toward Cahir",
+                  "to Cahir"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Waterford (Plunkett)",
+                "synonyms": [
+                  "towards Waterford (Plunkett)",
+                  "toward Waterford (Plunkett)",
+                  "to Waterford (Plunkett)"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Carrick-on-Shannon",
+                "synonyms": [
+                  "towards Carrick-on-Shannon",
+                  "toward Carrick-on-Shannon",
+                  "to Carrick-on-Shannon"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Carrick-on-Suir",
+                "synonyms": [
+                  "towards Carrick-on-Suir",
+                  "toward Carrick-on-Suir",
+                  "to Carrick-on-Suir"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Carrigaloe",
+                "synonyms": [
+                  "towards Carrigaloe",
+                  "toward Carrigaloe",
+                  "to Carrigaloe"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Carrigtwohill",
+                "synonyms": [
+                  "towards Carrigtwohill",
+                  "toward Carrigtwohill",
+                  "to Carrigtwohill"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Castleknock",
+                "synonyms": [
+                  "towards Castleknock",
+                  "toward Castleknock",
+                  "to Castleknock"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Clondalkin",
+                "synonyms": [
+                  "towards Clondalkin",
+                  "toward Clondalkin",
+                  "to Clondalkin"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Clongriffin",
+                "synonyms": [
+                  "towards Clongriffin",
+                  "toward Clongriffin",
+                  "to Clongriffin"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Clonmel",
+                "synonyms": [
+                  "towards Clonmel",
+                  "toward Clonmel",
+                  "to Clonmel"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Clonsilla",
+                "synonyms": [
+                  "towards Clonsilla",
+                  "toward Clonsilla",
+                  "to Clonsilla"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Collooney",
+                "synonyms": [
+                  "towards Collooney",
+                  "toward Collooney",
+                  "to Collooney"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Coolmine",
+                "synonyms": [
+                  "towards Coolmine",
+                  "toward Coolmine",
+                  "to Coolmine"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Donabate",
+                "synonyms": [
+                  "towards Donabate",
+                  "toward Donabate",
+                  "to Donabate"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Drumcondra",
+                "synonyms": [
+                  "towards Drumcondra",
+                  "toward Drumcondra",
+                  "to Drumcondra"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Dunboyne",
+                "synonyms": [
+                  "towards Dunboyne",
+                  "toward Dunboyne",
+                  "to Dunboyne"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Edgeworthstown",
+                "synonyms": [
+                  "towards Edgeworthstown",
+                  "toward Edgeworthstown",
+                  "to Edgeworthstown"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Enfield Stn",
+                "synonyms": [
+                  "towards Enfield Stn",
+                  "toward Enfield Stn",
+                  "to Enfield Stn"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Enniscorthy",
+                "synonyms": [
+                  "towards Enniscorthy",
+                  "toward Enniscorthy",
+                  "to Enniscorthy"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Fota",
+                "synonyms": [
+                  "towards Fota",
+                  "toward Fota",
+                  "to Fota"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Glounthaune",
+                "synonyms": [
+                  "towards Glounthaune",
+                  "toward Glounthaune",
+                  "to Glounthaune"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Gormanston Stn",
+                "synonyms": [
+                  "towards Gormanston Stn",
+                  "toward Gormanston Stn",
+                  "to Gormanston Stn"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Hansfield",
+                "synonyms": [
+                  "towards Hansfield",
+                  "toward Hansfield",
+                  "to Hansfield"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Howth Junction",
+                "synonyms": [
+                  "towards Howth Junction",
+                  "toward Howth Junction",
+                  "to Howth Junction"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Kilcock",
+                "synonyms": [
+                  "towards Kilcock",
+                  "toward Kilcock",
+                  "to Kilcock"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Kilcoole",
+                "synonyms": [
+                  "towards Kilcoole",
+                  "toward Kilcoole",
+                  "to Kilcoole"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Kildare",
+                "synonyms": [
+                  "towards Kildare",
+                  "toward Kildare",
+                  "to Kildare"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Kishoge",
+                "synonyms": [
+                  "towards Kishoge",
+                  "toward Kishoge",
+                  "to Kishoge"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Lansdowne",
+                "synonyms": [
+                  "towards Lansdowne",
+                  "toward Lansdowne",
+                  "to Lansdowne"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Laytown Station",
+                "synonyms": [
+                  "towards Laytown Station",
+                  "toward Laytown Station",
+                  "to Laytown Station"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Leixlip(Confey)",
+                "synonyms": [
+                  "towards Leixlip(Confey)",
+                  "toward Leixlip(Confey)",
+                  "to Leixlip(Confey)"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Leixlip(Louisa Bridge)",
+                "synonyms": [
+                  "towards Leixlip(Louisa Bridge)",
+                  "toward Leixlip(Louisa Bridge)",
+                  "to Leixlip(Louisa Bridge)"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Little Island",
+                "synonyms": [
+                  "towards Little Island",
+                  "toward Little Island",
+                  "to Little Island"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Malahide",
+                "synonyms": [
+                  "towards Malahide",
+                  "toward Malahide",
+                  "to Malahide"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Monasterevin",
+                "synonyms": [
+                  "towards Monasterevin",
+                  "toward Monasterevin",
+                  "to Monasterevin"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Navan Road Parkway",
+                "synonyms": [
+                  "towards Navan Road Parkway",
+                  "toward Navan Road Parkway",
+                  "to Navan Road Parkway"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Park West",
+                "synonyms": [
+                  "towards Park West",
+                  "toward Park West",
+                  "to Park West"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Pelletstown",
+                "synonyms": [
+                  "towards Pelletstown",
+                  "toward Pelletstown",
+                  "to Pelletstown"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Portarlington",
+                "synonyms": [
+                  "towards Portarlington",
+                  "toward Portarlington",
+                  "to Portarlington"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Portmarnock",
+                "synonyms": [
+                  "towards Portmarnock",
+                  "toward Portmarnock",
+                  "to Portmarnock"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Rathdrum",
+                "synonyms": [
+                  "towards Rathdrum",
+                  "toward Rathdrum",
+                  "to Rathdrum"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Rosslare Europort",
+                "synonyms": [
+                  "towards Rosslare Europort",
+                  "toward Rosslare Europort",
+                  "to Rosslare Europort"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Rosslare Strand",
+                "synonyms": [
+                  "towards Rosslare Strand",
+                  "toward Rosslare Strand",
+                  "to Rosslare Strand"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Rush and Lusk",
+                "synonyms": [
+                  "towards Rush and Lusk",
+                  "toward Rush and Lusk",
+                  "to Rush and Lusk"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Rushbrooke",
+                "synonyms": [
+                  "towards Rushbrooke",
+                  "toward Rushbrooke",
+                  "to Rushbrooke"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Sallins",
+                "synonyms": [
+                  "towards Sallins",
+                  "toward Sallins",
+                  "to Sallins"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Skerries",
+                "synonyms": [
+                  "towards Skerries",
+                  "toward Skerries",
+                  "to Skerries"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Sligo (MacDiarmada)",
+                "synonyms": [
+                  "towards Sligo (MacDiarmada)",
+                  "toward Sligo (MacDiarmada)",
+                  "to Sligo (MacDiarmada)"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Sydney Parade",
+                "synonyms": [
+                  "towards Sydney Parade",
+                  "toward Sydney Parade",
+                  "to Sydney Parade"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Tara Street",
+                "synonyms": [
+                  "towards Tara Street",
+                  "toward Tara Street",
+                  "to Tara Street"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Tipperary",
+                "synonyms": [
+                  "towards Tipperary",
+                  "toward Tipperary",
+                  "to Tipperary"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Wexford (O Hanrahan)",
+                "synonyms": [
+                  "towards Wexford (O Hanrahan)",
+                  "toward Wexford (O Hanrahan)",
+                  "to Wexford (O Hanrahan)"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     },
     "dialog": {
       "intents": [
@@ -99,7 +3576,9 @@
               "type": "AMAZON.NUMBER",
               "confirmationRequired": false,
               "elicitationRequired": false,
-              "prompts": { "elicitation": "Elicit.Slot.stopNumber" }
+              "prompts": {
+                "elicitation": "Elicit.Slot.stopNumber"
+              }
             }
           ]
         },
@@ -113,7 +3592,255 @@
               "type": "AMAZON.NUMBER",
               "confirmationRequired": false,
               "elicitationRequired": false,
-              "prompts": { "elicitation": "Elicit.Slot.stopNumber" }
+              "prompts": {
+                "elicitation": "Elicit.Slot.stopNumber"
+              }
+            }
+          ]
+        },
+        {
+          "name": "NextLuasIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "luasStation",
+              "type": "LUAS_STATION",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.luasStation"
+              }
+            },
+            {
+              "name": "luasDirection",
+              "type": "LUAS_DIRECTION",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.luasDirection"
+              }
+            }
+          ]
+        },
+        {
+          "name": "SetFavouriteLuasIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "luasStation",
+              "type": "LUAS_STATION",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.luasStation"
+              }
+            },
+            {
+              "name": "luasDirection",
+              "type": "LUAS_DIRECTION",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.luasDirection"
+              }
+            }
+          ]
+        },
+        {
+          "name": "NextLuasQueryIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "luasQuery",
+              "type": "AMAZON.SearchQuery",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.luasQuery"
+              }
+            }
+          ]
+        },
+        {
+          "name": "SetFavouriteLuasQueryIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "luasQuery",
+              "type": "AMAZON.SearchQuery",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.luasQuery"
+              }
+            }
+          ]
+        },
+        {
+          "name": "NextDartIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "dartStation",
+              "type": "DART_STATION",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.dartStation"
+              }
+            },
+            {
+              "name": "dartDirection",
+              "type": "DART_DIRECTION",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.dartDirection"
+              }
+            }
+          ]
+        },
+        {
+          "name": "SetFavouriteDartIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "dartStation",
+              "type": "DART_STATION",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.dartStation"
+              }
+            },
+            {
+              "name": "dartDirection",
+              "type": "DART_DIRECTION",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.dartDirection"
+              }
+            }
+          ]
+        },
+        {
+          "name": "NextDartQueryIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "dartQuery",
+              "type": "AMAZON.SearchQuery",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.dartQuery"
+              }
+            }
+          ]
+        },
+        {
+          "name": "SetFavouriteDartQueryIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "dartQuery",
+              "type": "AMAZON.SearchQuery",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.dartQuery"
+              }
+            }
+          ]
+        },
+        {
+          "name": "NextLocalTrainIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "trainStation",
+              "type": "LOCAL_TRAIN_STATION",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.trainStation"
+              }
+            },
+            {
+              "name": "trainDirection",
+              "type": "LOCAL_TRAIN_DIRECTION",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.trainDirection"
+              }
+            }
+          ]
+        },
+        {
+          "name": "SetFavouriteLocalTrainIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "trainStation",
+              "type": "LOCAL_TRAIN_STATION",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.trainStation"
+              }
+            },
+            {
+              "name": "trainDirection",
+              "type": "LOCAL_TRAIN_DIRECTION",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.trainDirection"
+              }
+            }
+          ]
+        },
+        {
+          "name": "NextLocalTrainQueryIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "trainQuery",
+              "type": "AMAZON.SearchQuery",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.trainQuery"
+              }
+            }
+          ]
+        },
+        {
+          "name": "SetFavouriteLocalTrainQueryIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "trainQuery",
+              "type": "AMAZON.SearchQuery",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.trainQuery"
+              }
             }
           ]
         }
@@ -124,8 +3851,209 @@
       {
         "id": "Elicit.Slot.stopNumber",
         "variations": [
-          { "type": "PlainText", "value": "Which stop number?" },
-          { "type": "PlainText", "value": "What's the number on the bus stop pole?" }
+          {
+            "type": "PlainText",
+            "value": "Which stop number?"
+          },
+          {
+            "type": "PlainText",
+            "value": "What's the number on the bus stop pole?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.luas.station",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which stop?"
+          },
+          {
+            "type": "PlainText",
+            "value": "What's the name of the stop?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.luas.direction",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which direction?"
+          },
+          {
+            "type": "PlainText",
+            "value": "Northbound, southbound, towards the city, or towards a terminus?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.dart.station",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which stop?"
+          },
+          {
+            "type": "PlainText",
+            "value": "What's the name of the stop?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.dart.direction",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which direction?"
+          },
+          {
+            "type": "PlainText",
+            "value": "Northbound, southbound, towards the city, or towards a terminus?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.train.station",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which stop?"
+          },
+          {
+            "type": "PlainText",
+            "value": "What's the name of the stop?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.train.direction",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which direction?"
+          },
+          {
+            "type": "PlainText",
+            "value": "Northbound, southbound, towards the city, or towards a terminus?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.luasStation",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which stop?"
+          },
+          {
+            "type": "PlainText",
+            "value": "What's the name of the stop?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.luasDirection",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which direction?"
+          },
+          {
+            "type": "PlainText",
+            "value": "Northbound, southbound, towards the city, or towards a terminus?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.luasQuery",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Say the stop name and direction."
+          },
+          {
+            "type": "PlainText",
+            "value": "Which direction?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.dartStation",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which stop?"
+          },
+          {
+            "type": "PlainText",
+            "value": "What's the name of the stop?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.dartDirection",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which direction?"
+          },
+          {
+            "type": "PlainText",
+            "value": "Northbound, southbound, towards the city, or towards a terminus?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.dartQuery",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Say the stop name and direction."
+          },
+          {
+            "type": "PlainText",
+            "value": "Which direction?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.trainStation",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which stop?"
+          },
+          {
+            "type": "PlainText",
+            "value": "What's the name of the stop?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.trainDirection",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which direction?"
+          },
+          {
+            "type": "PlainText",
+            "value": "Northbound, southbound, towards the city, or towards a terminus?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.trainQuery",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Say the stop name and direction."
+          },
+          {
+            "type": "PlainText",
+            "value": "Which direction?"
+          }
         ]
       }
     ]

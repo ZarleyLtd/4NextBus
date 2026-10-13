@@ -41,10 +41,10 @@ def say_minutes(p: Prediction, now: datetime) -> str:
     return f"in {mins} minutes"
 
 
-def describe(p: Prediction, now: datetime, with_headsign: bool = True) -> str:
+def describe(p: Prediction, now: datetime) -> str:
     base = f"the {say_route(p.route)}"
-    if with_headsign and p.headsign:
-        base += f" towards {humanise(p.headsign)}"
+    if p.headsign:
+        base += f" to {humanise(p.headsign)}"
     when = say_minutes(p, now)
     if not p.realtime:
         when = f"scheduled {when}" if when != "due now" else "scheduled now"
@@ -64,16 +64,53 @@ def next_buses_speech(stop_code: str, stop_name: str, preds: list[Prediction], n
     name = humanise(stop_name)
     if not preds:
         return f"I can't find any buses due at stop {stop_code}, {name}, in the next two hours."
-    # Only repeat the headsign when the same route appears with different destinations.
-    routes_multi_dest = {r for r in {p.route for p in preds}
-                         if len({p.headsign for p in preds if p.route == r}) > 1}
-    parts = []
-    seen_routes: set[str] = set()
-    for p in preds:
-        with_head = p.route in routes_multi_dest or p.route not in seen_routes
-        parts.append(describe(p, now, with_headsign=with_head))
-        seen_routes.add(p.route)
+    parts = [describe(p, now) for p in preds]
     text = f"At stop {stop_code}, {name}: {join_list(parts)}."
+    if not realtime_available:
+        text += " Live times are unavailable right now, so these are timetable times."
+    return text
+
+
+def _rail_clause(p: Prediction, now: datetime, lead: bool, dest: str, vehicle: str) -> str:
+    when = say_minutes(p, now)
+    if not p.realtime:
+        when = f"scheduled {when}" if when != "due now" else "scheduled now"
+    prefix = f"{vehicle} " if lead else "then "
+    if dest:
+        return f"{prefix}{when} to {dest}"
+    return f"{prefix}{when}"
+
+
+# Spoken as "Lewis" / "Lewises".
+LUAS = '<sub alias="Lewis">Luas</sub>'
+LUASES = '<sub alias="Lewises">Luases</sub>'
+
+
+def next_trams_speech(stop_label: str, preds: list[Prediction], now: datetime,
+                      realtime_available: bool = True) -> str:
+    if not preds:
+        return f"I can't find any {LUASES} due at {stop_label} in the next two hours."
+    parts = []
+    for i, p in enumerate(preds):
+        dest = humanise(p.headsign) if p.headsign else ""
+        parts.append(_rail_clause(p, now, lead=(i == 0), dest=dest, vehicle=LUAS))
+    text = f"At {stop_label}: " + ", ".join(parts) + "."
+    if not realtime_available:
+        text += " Live times are unavailable right now, so these are timetable times."
+    return text
+
+
+def next_trains_speech(stop_label: str, preds: list[Prediction], now: datetime,
+                       realtime_available: bool = True, empty_kind: str = "DART trains",
+                       dest_fn=None) -> str:
+    if not preds:
+        return f"I can't find any {empty_kind} due at {stop_label} in the next two hours."
+    name_dest = dest_fn or humanise
+    parts = []
+    for i, p in enumerate(preds):
+        dest = humanise(name_dest(p.headsign)) if p.headsign else ""
+        parts.append(_rail_clause(p, now, lead=(i == 0), dest=dest, vehicle="Train"))
+    text = f"At {stop_label}: " + ", ".join(parts) + "."
     if not realtime_available:
         text += " Live times are unavailable right now, so these are timetable times."
     return text

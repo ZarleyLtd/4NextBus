@@ -2,12 +2,21 @@
 
 Table (pk S, sk S), provisioned 25 RCU / 25 WCU (free tier):
 
-  STOP#<stop_id>   SCHED      stop_code, stop_name, hash, feed_version, gz (gzipped JSON departures)
-  META             STOPCODES  gz: {stop_code: [stop_id, stop_name]}
-  META             CALENDAR   gz: {YYYYMMDD: [service_id, ...]}
-  META             MANIFEST   gz: {stop_id: hash}, feed_version, updated_at
-  META             RTLOCK     last_fetch (N, epoch seconds)
-  USER#<user_id>   PROFILE    stop_id, stop_code, stop_name, updated_at
+  STOP#<stop_id>   SCHED            bus timetable (unchanged)
+  STOP#<stop_id>   SCHED#LUAS       tram timetable
+  STOP#<stop_id>   SCHED#DART       DART timetable (same Irish Rail id as commuter)
+  STOP#<stop_id>   SCHED#TRAIN      commuter timetable
+  META             STOPCODES        gz: {stop_code: [stop_id, stop_name]}  (bus only)
+  META             STATIONS#LUAS    gzip station catalog
+  META             STATIONS#DART
+  META             STATIONS#TRAIN
+  META             CALENDAR         gz: {YYYYMMDD: [service_id, ...]}
+  META             MANIFEST         gz: {stop_id or MODE:stop_id: hash}
+  META             RTLOCK           last_fetch (N, epoch seconds)
+  USER#<user_id>   PROFILE          bus favourite
+  USER#<user_id>   PROFILE#LUAS     tram favourite
+  USER#<user_id>   PROFILE#DART     DART favourite (heads + label)
+  USER#<user_id>   PROFILE#TRAIN    commuter favourite (heads + label)
 
 Uses the low-level boto3 client to keep Lambda cold starts short.
 """
@@ -23,6 +32,40 @@ import boto3
 from botocore.exceptions import ClientError
 
 from .models import ServiceCalendar, StopTimetable
+
+BUS = "bus"
+LUAS = "luas"
+DART = "dart"
+TRAIN = "train"
+
+
+def sched_sk(mode: str | None = None) -> str:
+    if not mode or mode == BUS:
+        return "SCHED"
+    return f"SCHED#{mode.upper()}"
+
+
+def profile_sk(mode: str | None = None) -> str:
+    if not mode or mode == BUS:
+        return "PROFILE"
+    return f"PROFILE#{mode.upper()}"
+
+
+def stations_sk(mode: str) -> str:
+    return f"STATIONS#{mode.upper()}"
+
+
+def manifest_key(stop_id: str, mode: str | None = None) -> str:
+    if not mode or mode == BUS:
+        return stop_id
+    return f"{mode.upper()}:{stop_id}"
+
+
+def parse_manifest_key(key: str) -> tuple[str | None, str]:
+    if ":" in key:
+        prefix, stop_id = key.split(":", 1)
+        return prefix.lower(), stop_id
+    return None, key
 
 
 def pack(obj: Any) -> bytes:
@@ -69,10 +112,11 @@ class Store:
 
     # ---- timetable -------------------------------------------------------------
 
-    def put_stop(self, stop: StopTimetable, feed_version: str, hash_: str) -> int:
+    def put_stop(self, stop: StopTimetable, feed_version: str, hash_: str,
+                 mode: str | None = None) -> int:
         """Write a stop's timetable. Returns approximate item size in bytes."""
         gz = pack([d.to_row() for d in stop.departures])
-        self._put(f"STOP#{stop.stop_id}", "SCHED", {
+        self._put(f"STOP#{stop.stop_id}", sched_sk(mode), {
             "stop_code": self._s(stop.stop_code),
             "stop_name": self._s(stop.stop_name),
             "hash": self._s(hash_),
@@ -82,8 +126,8 @@ class Store:
         })
         return len(gz) + 200
 
-    def get_stop(self, stop_id: str) -> StopTimetable | None:
-        item = self._get(f"STOP#{stop_id}", "SCHED")
+    def get_stop(self, stop_id: str, mode: str | None = None) -> StopTimetable | None:
+        item = self._get(f"STOP#{stop_id}", sched_sk(mode))
         if not item:
             return None
         return StopTimetable.from_dict({
@@ -92,6 +136,17 @@ class Store:
             "stop_name": item["stop_name"]["S"],
             "departures": unpack(item["gz"]["B"]),
         })
+
+    def put_stations(self, mode: str, stations: list[dict]) -> None:
+        self._put("META", stations_sk(mode), {
+            "gz": self._b(pack(stations)), "updated_at": self._n(int(time.time())),
+        })
+
+    def get_stations(self, mode: str) -> list[dict]:
+        item = self._get("META", stations_sk(mode))
+        if not item:
+            return []
+        return unpack(item["gz"]["B"])
 
     def put_stop_codes(self, codes: dict[str, dict]) -> None:
         compact = {code: [v["stop_id"], v["stop_name"]] for code, v in codes.items()}
@@ -123,8 +178,11 @@ class Store:
             return {}, None
         return unpack(item["gz"]["B"]), item.get("feed_version", {}).get("S")
 
-    def delete_stop(self, stop_id: str) -> None:
-        self.ddb.delete_item(TableName=self.table, Key={"pk": {"S": f"STOP#{stop_id}"}, "sk": {"S": "SCHED"}})
+    def delete_stop(self, stop_id: str, mode: str | None = None) -> None:
+        self.ddb.delete_item(
+            TableName=self.table,
+            Key={"pk": {"S": f"STOP#{stop_id}"}, "sk": {"S": sched_sk(mode)}},
+        )
 
     # ---- realtime lock -----------------------------------------------------------
 
@@ -146,14 +204,36 @@ class Store:
 
     # ---- users -------------------------------------------------------------------
 
-    def get_favourite(self, user_id: str) -> dict | None:
-        item = self._get(f"USER#{user_id}", "PROFILE")
+    def get_favourite(self, user_id: str, mode: str | None = None) -> dict | None:
+        item = self._get(f"USER#{user_id}", profile_sk(mode))
         if not item or "stop_id" not in item:
             return None
-        return {"stop_id": item["stop_id"]["S"], "stop_code": item["stop_code"]["S"], "stop_name": item["stop_name"]["S"]}
+        heads_raw = item.get("heads", {}).get("S") or "[]"
+        try:
+            heads = json.loads(heads_raw)
+        except json.JSONDecodeError:
+            heads = []
+        return {
+            "stop_id": item["stop_id"]["S"],
+            "stop_code": item["stop_code"]["S"],
+            "stop_name": item["stop_name"]["S"],
+            "heads": heads if isinstance(heads, list) else [],
+            "label": (item.get("label") or {}).get("S") or "",
+        }
 
-    def set_favourite(self, user_id: str, stop_id: str, stop_code: str, stop_name: str) -> None:
-        self._put(f"USER#{user_id}", "PROFILE", {
+    def set_favourite(self, user_id: str, stop_id: str, stop_code: str, stop_name: str,
+                      mode: str | None = None, heads: list[str] | None = None, label: str = "") -> None:
+        attrs = {
             "stop_id": self._s(stop_id), "stop_code": self._s(stop_code), "stop_name": self._s(stop_name),
             "updated_at": self._n(int(time.time())),
-        })
+        }
+        if mode and mode != BUS:
+            attrs["heads"] = self._s(json.dumps(heads or []))
+            attrs["label"] = self._s(label)
+        self._put(f"USER#{user_id}", profile_sk(mode), attrs)
+
+    def clear_favourite(self, user_id: str, mode: str | None = None) -> None:
+        self.ddb.delete_item(
+            TableName=self.table,
+            Key={"pk": {"S": f"USER#{user_id}"}, "sk": {"S": profile_sk(mode)}},
+        )

@@ -7,6 +7,10 @@ NTA GTFS-Realtime API. Invocation name: **four next bus**.
 - "Alexa, ask four next bus to set my favourite stop to 184"
 - "Alexa, ask four next bus for my favourite stop"
 - "Alexa, ask four next bus" (uses your favourite)
+- "Alexa, ask four next bus or LUAS from Dundrum southbound"
+- "Alexa, ask four next bus or LUAS to set my favourite stop to Dundrum southbound"
+- "Alexa, ask four next bus to set my favourite LUAS stop to Dundrum southbound"
+- The same two favourite wordings work with Dart and local train.
 
 The full intent and utterance list is in [Voice model](#voice-model). Copy that section when
 building a sibling skill (for example a Luas/tram skill): same three custom intents, one
@@ -66,12 +70,21 @@ These are the phrases to test on a phone or in the console Test tab.
 | Alexa, ask four next bus for my favourite stop | `GetFavouriteStopIntent` | — |
 | Alexa, ask four next bus for help | `AMAZON.HelpIntent` | — |
 | Alexa, ask four next bus to stop | `AMAZON.StopIntent` | — |
+| Alexa, ask four next bus or LUAS from Dundrum southbound | `NextLuasIntent` | station + direction |
+| Alexa, ask four next bus or LUAS to set my favourite stop to Dundrum southbound | `SetFavouriteLuasIntent` | station + direction |
+| Alexa, ask four next bus to set my favourite LUAS stop to Dundrum southbound | `SetFavouriteLuasIntent` | station + direction |
+| Alexa, ask four next bus or Dart from Pearse southbound | `NextDartIntent` | station + direction |
+| Alexa, ask four next bus or local train from Maynooth westbound | `NextLocalTrainIntent` | station + direction |
 
 Store listing `examplePhrases` (Amazon allows three):
 
 1. `Alexa, ask four next bus from stop 184`
-2. `Alexa, ask four next bus to set my favourite stop to 184`
-3. `Alexa, ask four next bus for the next bus`
+2. `Alexa, ask four next bus or LUAS from Dundrum southbound`
+3. `Alexa, ask four next bus or LUAS to set my favourite stop to Dundrum southbound`
+
+LUAS, Dart, and local train each have their own favourite. Bare `set my favourite stop to 184` still saves the **bus** favourite. Local train means Irish Rail Commuter (not DART or InterCity). Shared names such as Connolly need the mode word. LUAS is also accepted as Lewis, Louis, Lucas, or loos.
+
+Regenerate the named-mode slot values with `python tools/build_voice_model.py` (keeps the bus intents). Paste that JSON into **every** English locale (`en-GB`, `en-US`, `en-AU`, `en-CA`, `en-IN`). A published skill cannot drop locales; each locale must use the same unique slot names (`luasStation`, `dartStation`, `trainStation`) or the India model fails the build. Deploy new code only to the development Lambda: `python tools/deploy.py code --dev`. Live `FourNextBus-Skill` stays unchanged until certification.
 
 ### Custom intents
 

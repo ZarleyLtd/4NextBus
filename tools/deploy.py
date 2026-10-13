@@ -5,6 +5,11 @@
   python tools/deploy.py code           # build the Lambda zip and upload it directly
   python tools/deploy.py ingest-key     # create an access key for the GitHub Actions user (printed once)
   python tools/deploy.py all --skill-id ... --email ...
+  python tools/deploy.py stack --dev --skill-id amzn1.ask.skill.devcopy
+  python tools/deploy.py code --dev
+  python tools/deploy.py test --dev --intent NextLuasIntent --station Dundrum --direction southbound
+
+--dev updates FourNextBus-Dev-Skill only (shared FourNextBus table). Live FourNextBus-Skill stays unchanged.
 
 Credentials: standard boto3 resolution (AWS_PROFILE / ~/.aws/credentials / env vars).
 """
@@ -139,7 +144,34 @@ def build_zip() -> bytes:
     return data
 
 
+def ensure_skill_ddb_delete() -> None:
+    """Forget-favourite uses DeleteItem; the original skill role only had Get/Put/Update."""
+    import json
+    iam = session().client("iam")
+    lam = session().client("lambda")
+    live_name = os.environ.get("FOURNEXTBUS_FUNCTION", "FourNextBus-Skill")
+    cfg = lam.get_function_configuration(FunctionName=live_name)
+    role_name = cfg["Role"].rsplit("/", 1)[-1]
+    doc = iam.get_role_policy(RoleName=role_name, PolicyName="skill")["PolicyDocument"]
+    changed = False
+    for stmt in doc.get("Statement") or []:
+        actions = stmt.get("Action")
+        if isinstance(actions, str):
+            actions = [actions]
+        if not isinstance(actions, list):
+            continue
+        if "dynamodb:PutItem" in actions and "dynamodb:DeleteItem" not in actions:
+            stmt["Action"] = list(actions) + ["dynamodb:DeleteItem"]
+            changed = True
+    if not changed:
+        print(f"IAM {role_name}: DeleteItem already allowed")
+        return
+    iam.put_role_policy(RoleName=role_name, PolicyName="skill", PolicyDocument=json.dumps(doc))
+    print(f"IAM {role_name}: added dynamodb:DeleteItem")
+
+
 def deploy_code() -> None:
+    ensure_skill_ddb_delete()
     data = build_zip()
     lam = session().client("lambda")
     print(f"uploading to {FUNCTION} ...")
@@ -166,10 +198,89 @@ def create_ingest_key() -> None:
 
 # ---- smoke test --------------------------------------------------------------------------
 
-def invoke_test(stop_code: str) -> None:
+def ensure_dev_function(skill_id: str) -> None:
+    """Clone the live Lambda as FourNextBus-Dev-Skill, same role and table, new Alexa skill ID."""
+    import json
+    lam = session().client("lambda")
+    logs = session().client("logs")
+    live_name = os.environ.get("FOURNEXTBUS_FUNCTION", "FourNextBus-Skill")
+    live = lam.get_function_configuration(FunctionName=live_name)
+    log_group = f"/aws/lambda/{FUNCTION}"
+    try:
+        logs.create_log_group(logGroupName=log_group)
+        logs.put_retention_policy(logGroupName=log_group, retentionInDays=14)
+    except ClientError as exc:
+        if exc.response["Error"]["Code"] != "ResourceAlreadyExistsException":
+            raise
+    env = dict((live.get("Environment") or {}).get("Variables") or {})
+    env["FOURNEXTBUS_TABLE"] = TABLE
+    env["ALEXA_SKILL_ID"] = skill_id
+    try:
+        lam.get_function(FunctionName=FUNCTION)
+        print(f"{FUNCTION} already exists; updating configuration ...")
+        lam.update_function_configuration(
+            FunctionName=FUNCTION,
+            Role=live["Role"],
+            Runtime=live["Runtime"],
+            Handler=live["Handler"],
+            Timeout=live["Timeout"],
+            MemorySize=live["MemorySize"],
+            Environment={"Variables": env},
+        )
+        lam.get_waiter("function_updated_v2").wait(FunctionName=FUNCTION)
+    except ClientError as exc:
+        if exc.response["Error"]["Code"] != "ResourceNotFoundException":
+            raise
+        print(f"creating {FUNCTION} ...")
+        zip_bytes = build_zip()
+        lam.create_function(
+            FunctionName=FUNCTION,
+            Role=live["Role"],
+            Runtime=live["Runtime"],
+            Handler=live["Handler"],
+            Timeout=live["Timeout"],
+            MemorySize=live["MemorySize"],
+            Architectures=live.get("Architectures") or ["x86_64"],
+            Environment={"Variables": env},
+            Code={"ZipFile": zip_bytes},
+            Description="4NextBus development skill (live FourNextBus-Skill is unchanged)",
+        )
+        lam.get_waiter("function_active_v2").wait(FunctionName=FUNCTION)
+    stmt_id = "AlexaDevSkill"
+    try:
+        lam.remove_permission(FunctionName=FUNCTION, StatementId=stmt_id)
+    except ClientError:
+        pass
+    lam.add_permission(
+        FunctionName=FUNCTION,
+        StatementId=stmt_id,
+        Action="lambda:InvokeFunction",
+        Principal="alexa-appkit.amazon.com",
+        EventSourceToken=skill_id,
+    )
+    cfg = lam.get_function_configuration(FunctionName=FUNCTION)
+    print(f"dev function ready: {cfg['FunctionArn']}")
+    print("Paste that ARN as the development skill endpoint. Leave the live skill on FourNextBus-Skill.")
+
+
+def invoke_test(stop_code: str, intent_name: str, station: str, direction: str) -> None:
     import json
     lam = session().client("lambda")
     app_id = os.environ.get("ALEXA_SKILL_ID", "test").split(",")[0].strip()
+    slots = {}
+    if intent_name == "NextBusIntent":
+        slots = {"stopNumber": {"name": "stopNumber", "value": stop_code}}
+    else:
+        prefix = "luas"
+        if "Dart" in intent_name:
+            prefix = "dart"
+        elif "LocalTrain" in intent_name:
+            prefix = "train"
+        station_slot, direction_slot = f"{prefix}Station", f"{prefix}Direction"
+        if station:
+            slots[station_slot] = {"name": station_slot, "value": station}
+        if direction:
+            slots[direction_slot] = {"name": direction_slot, "value": direction}
     event = {
         "version": "1.0",
         "session": {"new": True, "sessionId": "s", "application": {"applicationId": app_id},
@@ -179,8 +290,7 @@ def invoke_test(stop_code: str) -> None:
                                "device": {"deviceId": "d", "supportedInterfaces": {}}}},
         "request": {"type": "IntentRequest", "requestId": "r", "locale": "en-GB",
                     "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                    "intent": {"name": "NextBusIntent", "confirmationStatus": "NONE",
-                               "slots": {"stopNumber": {"name": "stopNumber", "value": stop_code}}}},
+                    "intent": {"name": intent_name, "confirmationStatus": "NONE", "slots": slots}},
     }
     t0 = time.perf_counter()
     resp = lam.invoke(FunctionName=FUNCTION, Payload=json.dumps(event).encode())
@@ -195,20 +305,36 @@ def main() -> None:
     ap.add_argument("--email", default=os.environ.get("ALERT_EMAIL"))
     ap.add_argument("--reserved-concurrency", default="1", help='"none" if your account quota is too low')
     ap.add_argument("--stop", default="184", help="stop code for the test invocation")
+    ap.add_argument("--dev", action="store_true",
+                    help="target FourNextBus-Dev-Skill (shared table; live Lambda unchanged)")
+    ap.add_argument("--intent", default="NextBusIntent", help="intent name for test")
+    ap.add_argument("--station", default="", help="station slot for named-mode test")
+    ap.add_argument("--direction", default="", help="direction slot for named-mode test")
     args = ap.parse_args()
 
+    global STACK, FUNCTION
+    if args.dev:
+        STACK = os.environ.get("FOURNEXTBUS_DEV_STACK", "FourNextBus-Dev")
+        FUNCTION = os.environ.get("FOURNEXTBUS_DEV_FUNCTION", "FourNextBus-Dev-Skill")
+        print(f"dev target: function={FUNCTION} table={TABLE}")
+
     if args.action in ("stack", "all"):
-        if not args.skill_id or not args.email:
-            sys.exit("--skill-id and --email are required for the stack (or set ALEXA_SKILL_ID / ALERT_EMAIL in .env)")
-        deploy_stack(args.skill_id, args.email, args.reserved_concurrency)
-    if args.action in ("key", "all"):
+        if args.dev:
+            if not args.skill_id:
+                sys.exit("--skill-id is required for the development Lambda")
+            ensure_dev_function(args.skill_id.split(",")[0].strip())
+        else:
+            if not args.skill_id or not args.email:
+                sys.exit("--skill-id and --email are required for the stack (or set ALEXA_SKILL_ID / ALERT_EMAIL in .env)")
+            deploy_stack(args.skill_id, args.email, args.reserved_concurrency)
+    if args.action in ("key", "all") and not args.dev:
         put_key()
     if args.action in ("code", "all"):
         deploy_code()
     if args.action == "ingest-key":
         create_ingest_key()
     if args.action == "test":
-        invoke_test(args.stop)
+        invoke_test(args.stop, args.intent, args.station, args.direction)
 
 
 if __name__ == "__main__":

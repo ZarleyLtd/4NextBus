@@ -35,9 +35,11 @@ class FakeStore:
     def get_stop_codes(self): return self.codes
     def get_calendar(self): return self.calendar
     def get_stop(self, stop_id): return self.stops.get(stop_id)
-    def get_favourite(self, uid): return self.favourites.get(uid)
-    def set_favourite(self, uid, stop_id, code, name):
+    def get_favourite(self, uid, mode=None): return self.favourites.get(uid)
+    def set_favourite(self, uid, stop_id, code, name, mode=None, heads=None, label=""):
         self.favourites[uid] = {"stop_id": stop_id, "stop_code": code, "stop_name": name}
+    def clear_favourite(self, uid, mode=None):
+        self.favourites.pop(uid, None)
     def try_acquire_rt_lock(self, now_epoch, min_interval=60):
         if self.last_fetch is None or self.last_fetch <= now_epoch - min_interval:
             self.last_fetch = now_epoch
@@ -88,8 +90,8 @@ def test_next_bus_with_stop_number():
     text = speech(resp)
     # t1 delayed 345s -> 20:18:45 (12 min); t2 scheduled 20:15 (9 min); t3 cancelled; t4 20:40 (34 min)
     assert "At stop 184, Fairfield Road:" in text
-    assert "the E2 towards Dun Laoghaire scheduled in 9 minutes" in text
-    assert "the 23 towards Merrion Square in 12 minutes" in text
+    assert "the E2 to Dun Laoghaire scheduled in 9 minutes" in text
+    assert "the 23 to Merrion Square in 12 minutes" in text
     assert "Ballywaltrim" not in text
     assert resp["response"]["shouldEndSession"] is True
     assert resp["response"]["card"]["title"] == "Stop 184 - Fairfield Road"
@@ -118,6 +120,19 @@ def test_set_get_and_use_favourite():
     assert "At stop 184, Fairfield Road:" in speech(resp)
 
 
+def test_forget_favourite_stop():
+    app.handler(intent("SetFavouriteStopIntent", stopNumber="184"), None)
+    resp = app.handler(intent("ClearFavouriteStopIntent"), None)
+    assert "I've forgotten your favourite stop" in speech(resp)
+    assert "haven't set a favourite stop" in speech(app.handler(intent("GetFavouriteStopIntent"), None))
+    none = app.handler(intent("ClearFavouriteStopIntent"), None)
+    assert "didn't have a favourite stop saved" in speech(none)
+    all_gone = app.handler(intent("ClearAllFavouritesIntent"), None)
+    assert "I've forgotten all your favourite stops" in speech(all_gone)
+    launch = app.handler(envelope({"type": "LaunchRequest"}), None)
+    assert "Welcome to four next bus" in speech(launch)
+
+
 def test_launch_without_favourite_welcomes():
     resp = app.handler(envelope({"type": "LaunchRequest"}), None)
     assert "Welcome to four next bus" in speech(resp)
@@ -125,7 +140,9 @@ def test_launch_without_favourite_welcomes():
 
 
 def test_help_stop_fallback():
-    assert "set my favourite stop to" in speech(app.handler(intent("AMAZON.HelpIntent"), None))
+    help_text = speech(app.handler(intent("AMAZON.HelpIntent"), None))
+    assert "set my favourite stop to" in help_text
+    assert "forget my favourite stop" in help_text
     assert "Goodbye" in speech(app.handler(intent("AMAZON.StopIntent"), None))
     assert "didn't catch that" in speech(app.handler(intent("AMAZON.FallbackIntent"), None))
 

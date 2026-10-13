@@ -32,7 +32,7 @@ from dotenv import load_dotenv
 from ingest.gtfs_static import GtfsStatic, ensure_gtfs
 from src.common.gtfs_time import now_dublin
 from src.common.models import StopTimetable
-from src.common.store import Store, content_hash, pack
+from src.common.store import DART, LUAS, TRAIN, Store, content_hash, manifest_key, pack, parse_manifest_key
 
 log = logging.getLogger("ingest")
 
@@ -118,22 +118,24 @@ def main() -> int:
     stats = {"stops": 0, "written": 0, "unchanged": 0, "bytes": 0, "max_bytes": 0, "max_stop": "",
              "deps_in": 0, "deps_kept": 0}
     sizes: list[int] = []
+    collected: dict[str, list[StopTimetable]] = {LUAS: [], DART: [], TRAIN: []}
 
-    for stop in gtfs.all_bus_stop_timetables():
+    def write_stop(stop: StopTimetable, mode: str | None = None) -> None:
+        if args.limit and stats["stops"] >= args.limit:
+            return
         stats["stops"] += 1
-        if args.limit and stats["stops"] > args.limit:
-            break
         stats["deps_in"] += len(stop.departures)
         keep_window_departures(stop, active)
         stats["deps_kept"] += len(stop.departures)
         rows = [d.to_row() for d in stop.departures]
         h = content_hash([stop.stop_code, stop.stop_name, rows])
-        new_manifest[stop.stop_id] = h
-        if old_manifest.get(stop.stop_id) == h:
+        key = manifest_key(stop.stop_id, mode)
+        new_manifest[key] = h
+        if old_manifest.get(key) == h:
             stats["unchanged"] += 1
-            continue
+            return
         if store:
-            size = store.put_stop(stop, feed_version, h)
+            size = store.put_stop(stop, feed_version, h, mode=mode)
             pacer.consume(size)
         else:
             size = len(pack(rows)) + 200
@@ -141,21 +143,52 @@ def main() -> int:
         stats["written"] += 1
         stats["bytes"] += size
         if size > stats["max_bytes"]:
-            stats["max_bytes"], stats["max_stop"] = size, f"{stop.stop_id} {stop.stop_name} ({len(rows)} deps)"
+            label = mode or "bus"
+            stats["max_bytes"], stats["max_stop"] = (
+                size, f"{label} {stop.stop_id} {stop.stop_name} ({len(rows)} deps)")
         if stats["written"] % 500 == 0:
             log.info("... %d stops, %d written, %.1f MB, %.0fs", stats["stops"], stats["written"],
                      stats["bytes"] / 1e6, time.perf_counter() - t0)
 
+    for stop in gtfs.all_bus_stop_timetables():
+        if args.limit and stats["stops"] >= args.limit:
+            break
+        write_stop(stop)
+
+    if not args.limit or stats["stops"] < args.limit:
+        for stop in gtfs.all_tram_stop_timetables():
+            if args.limit and stats["stops"] >= args.limit:
+                break
+            collected[LUAS].append(stop)
+            write_stop(stop, LUAS)
+        for stop in gtfs.all_dart_stop_timetables():
+            if args.limit and stats["stops"] >= args.limit:
+                break
+            collected[DART].append(stop)
+            write_stop(stop, DART)
+        for stop in gtfs.all_commuter_stop_timetables():
+            if args.limit and stats["stops"] >= args.limit:
+                break
+            collected[TRAIN].append(stop)
+            write_stop(stop, TRAIN)
+
     # Remove stops that disappeared from the feed.
     removed = [sid for sid in old_manifest if sid not in new_manifest] if not args.limit else []
     if store:
-        for sid in removed:
-            store.delete_stop(sid)
+        for key in removed:
+            mode, sid = parse_manifest_key(key)
+            store.delete_stop(sid, mode)
             pacer.consume(1024)
 
     codes = gtfs.stop_code_map()
+    luas_stations = gtfs.luas_station_catalog(collected[LUAS] or None)
+    dart_stations = gtfs.dart_station_catalog(collected[DART] or None)
+    train_stations = gtfs.train_station_catalog(collected[TRAIN] or None)
     if store:
         store.put_stop_codes(codes)
+        store.put_stations(LUAS, luas_stations)
+        store.put_stations(DART, dart_stations)
+        store.put_stations(TRAIN, train_stations)
         store.put_calendar(calendar)
         store.put_manifest(new_manifest, feed_version)
     else:
@@ -163,6 +196,8 @@ def main() -> int:
                  len(pack({c: [v["stop_id"], v["stop_name"]] for c, v in codes.items()})) / 1024,
                  len(pack({k: sorted(v) for k, v in calendar.items()})) / 1024,
                  len(pack(new_manifest)) / 1024)
+        log.info("stations LUAS %d, DART %d, TRAIN %d",
+                 len(luas_stations), len(dart_stations), len(train_stations))
 
     if sizes:
         sizes.sort()

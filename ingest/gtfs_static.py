@@ -16,6 +16,7 @@ import requests
 
 from src.common.gtfs_time import parse_yyyymmdd, yyyymmdd
 from src.common.models import Departure, ServiceCalendar, StopTimetable
+from src.modes.train.stations import normalize_name as train_normalize_name
 
 log = logging.getLogger(__name__)
 
@@ -23,8 +24,73 @@ GTFS_URL = "https://www.transportforireland.ie/transitData/Data/GTFS_Realtime.zi
 NEEDED = ["agency.txt", "routes.txt", "stops.txt", "trips.txt", "calendar.txt", "calendar_dates.txt", "stop_times.txt", "feed_info.txt"]
 
 # Agencies covered by the NTA GTFS-R feed (Dublin Bus, Go-Ahead Ireland, Bus Eireann).
-# route_type 3 = bus. Luas (0) and Irish Rail (2) are excluded.
+# route_type 3 = bus. Luas = 0, Irish Rail = 2.
 BUS_ROUTE_TYPE = "3"
+TRAM_ROUTE_TYPE = "0"
+RAIL_ROUTE_TYPE = "2"
+DART_SHORT_NAME = "DART"
+
+# TFI labels only some corridors as Commuter. Match 4NextLocalTrain allowlist.
+_ROUTE_NEEDLES = (
+    "dro/dun", "drogheda", "dundalk",
+    "maynooth",
+    "portlaois",
+    "mal-cobh", "mallow - cobh", "mallow-cobh",
+    "limerick-wat", "waterford - limerick", "limerick - waterford",
+    "europort",
+    "dub-sligo", "dublin - sligo",
+)
+_INTERCITY_DEST = frozenset({
+    "sligo", "belfast", "galway", "tralee", "westport", "ballina",
+    "rosslare", "europort", "wexford", "enniscorthy", "killarney",
+    "limerick",
+})
+
+
+def _route_blob(route_id: str, short_name: str, long_name: str) -> str:
+    return f"{route_id} {short_name} {long_name}".lower()
+
+
+def is_commuter_route(route_id: str, short_name: str, long_name: str) -> bool:
+    if (short_name or "").strip().lower() == "dart":
+        return False
+    blob = _route_blob(route_id or "", short_name or "", long_name or "")
+    if "commuter" in blob:
+        return True
+    return any(n in blob for n in _ROUTE_NEEDLES)
+
+
+def is_commuter_headsign(headsign: str) -> bool:
+    key = train_normalize_name(headsign)
+    if not key:
+        return True
+    if "limerick junction" in key:
+        return True
+    for marker in _INTERCITY_DEST:
+        if marker == "limerick" and "junction" in key:
+            continue
+        if marker in key:
+            return False
+    return True
+
+
+def commuter_route_sql() -> str:
+    id_needles = ("dro/dun", "maynooth", "portlaois", "mal-cobh", "limerick-wat", "europort", "dub-sligo")
+    name_needles = (
+        "drogheda", "dundalk", "maynooth", "portlaoise", "mallow - cobh",
+        "waterford - limerick", "limerick - waterford", "europort", "dublin - sligo",
+    )
+    clauses = ["lower(r.route_short_name) = 'commuter'"]
+    for n in id_needles:
+        clauses.append("lower(r.route_id) like '%" + n.replace("'", "''") + "%'")
+    for n in name_needles:
+        clauses.append("lower(coalesce(r.route_long_name,'')) like '%" + n.replace("'", "''") + "%'")
+    joined = " or ".join(clauses)
+    return (
+        "r.route_type = '" + RAIL_ROUTE_TYPE + "' "
+        "and lower(coalesce(r.route_short_name,'')) <> 'dart' "
+        "and (" + joined + ")"
+    )
 
 
 def ensure_gtfs(cache_dir: Path, max_age_hours: float = 20.0, url: str = GTFS_URL) -> Path:
@@ -175,3 +241,90 @@ class GtfsStatic:
                     departures=[Departure(d["trip_id"], d["route"], d["headsign"],
                                           parse_gtfs_time(d["dep"]), d["service_id"], d["seq"]) for d in deps],
                 )
+
+    def _all_stop_timetables(self, route_filter_sql: str, headsign_ok=None):
+        cur = self.con.execute(f"""
+            select st.stop_id, s.stop_code, s.stop_name,
+                   list(struct_pack(trip_id := st.trip_id, route := r.route_short_name,
+                                    headsign := coalesce(nullif(st.stop_headsign,''), t.trip_headsign, ''),
+                                    dep := st.departure_time, service_id := t.service_id,
+                                    seq := cast(st.stop_sequence as integer))
+                        order by st.departure_time, st.trip_id, st.stop_sequence) as deps
+            from stop_times st
+            join trips t on t.trip_id = st.trip_id
+            join routes r on r.route_id = t.route_id and {route_filter_sql}
+            join stops s on s.stop_id = st.stop_id
+            where st.pickup_type is distinct from '1'
+            group by st.stop_id, s.stop_code, s.stop_name
+        """)
+        from src.common.gtfs_time import parse_gtfs_time
+        while True:
+            batch = cur.fetchmany(200)
+            if not batch:
+                break
+            for stop_id, code, name, deps in batch:
+                departures = [
+                    Departure(d["trip_id"], d["route"], d["headsign"],
+                              parse_gtfs_time(d["dep"]), d["service_id"], d["seq"])
+                    for d in deps
+                    if headsign_ok is None or headsign_ok(d["headsign"])
+                ]
+                if not departures:
+                    continue
+                yield StopTimetable(
+                    stop_id=stop_id, stop_code=code or "", stop_name=name or "",
+                    departures=departures,
+                )
+
+    def all_tram_stop_timetables(self):
+        yield from self._all_stop_timetables(f"r.route_type = '{TRAM_ROUTE_TYPE}'")
+
+    def all_dart_stop_timetables(self):
+        yield from self._all_stop_timetables(
+            f"r.route_type = '{RAIL_ROUTE_TYPE}' and r.route_short_name = '{DART_SHORT_NAME}'"
+        )
+
+    def all_commuter_stop_timetables(self):
+        yield from self._all_stop_timetables(commuter_route_sql(), is_commuter_headsign)
+
+    def luas_station_catalog(self, stops: list[StopTimetable] | None = None) -> list[dict]:
+        from collections import defaultdict
+        from src.modes.luas.stations import build_station
+        grouped: dict[str, list[dict]] = defaultdict(list)
+        source = stops if stops is not None else list(self.all_tram_stop_timetables())
+        for stop in source:
+            heads = sorted({d.headsign for d in stop.departures if d.headsign})
+            grouped[stop.stop_name].append({
+                "stop_id": stop.stop_id,
+                "stop_code": stop.stop_code,
+                "headsigns": heads,
+            })
+        catalog = [build_station(name, plats).as_dict() for name, plats in grouped.items()]
+        catalog.sort(key=lambda s: s["spoken"])
+        return catalog
+
+    def dart_station_catalog(self, stops: list[StopTimetable] | None = None) -> list[dict]:
+        from src.modes.dart.stations import build_station, split_raw_platforms
+        source = stops if stops is not None else list(self.all_dart_stop_timetables())
+        catalog = []
+        for stop in source:
+            heads = sorted({d.headsign for d in stop.departures if d.headsign})
+            plats = split_raw_platforms(stop.stop_id, stop.stop_code, stop.stop_name, heads)
+            if not plats:
+                continue
+            catalog.append(build_station(stop.stop_name, plats).as_dict())
+        catalog.sort(key=lambda s: s["spoken"])
+        return catalog
+
+    def train_station_catalog(self, stops: list[StopTimetable] | None = None) -> list[dict]:
+        from src.modes.train.stations import build_station, split_raw_platforms
+        source = stops if stops is not None else list(self.all_commuter_stop_timetables())
+        catalog = []
+        for stop in source:
+            heads = sorted({d.headsign for d in stop.departures if d.headsign})
+            plats = split_raw_platforms(stop.stop_id, stop.stop_code, stop.stop_name, heads)
+            if not plats:
+                continue
+            catalog.append(build_station(stop.stop_name, plats).as_dict())
+        catalog.sort(key=lambda s: s["spoken"])
+        return catalog

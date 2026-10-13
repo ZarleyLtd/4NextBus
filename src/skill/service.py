@@ -107,3 +107,6 @@ class BusService:
 
     def set_favourite(self, user_id: str, ref: StopRef) -> None:
         self.store.set_favourite(user_id, ref.stop_id, ref.stop_code, ref.stop_name)
+
+    def clear_favourite(self, user_id: str) -> None:
+        self.store.clear_favourite(user_id)
