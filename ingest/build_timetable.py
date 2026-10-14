@@ -3,8 +3,9 @@
 Run locally:   python -m ingest.build_timetable [--dry-run] [--force] [--limit N]
 Run in CI:     see .github/workflows/ingest.yml
 
-Only stops whose departures changed since the last run are written (hash manifest),
-and writes are paced to stay under the table's 25 WCU/s free-tier allowance.
+Only stops whose departures changed since the last run are written (hash manifest).
+For the duration of a real run the table's write capacity is raised to 10 WCU and
+writes are paced under that; a finally block puts write capacity back to 1.
 Each stop keeps every trip_id/service_id copy that can run in a 5-day window
 (yesterday through four more days). The rest of the TFI dump is not stored.
 """
@@ -13,6 +14,7 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+import signal
 import sys
 import time
 from datetime import timedelta
@@ -27,6 +29,8 @@ try:
 except ImportError:
     pass
 
+import boto3
+from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 
 from ingest.gtfs_static import GtfsStatic, ensure_gtfs
@@ -36,7 +40,9 @@ from src.common.store import DART, LUAS, TRAIN, Store, content_hash, manifest_ke
 
 log = logging.getLogger("ingest")
 
-WCU_BUDGET_PER_SECOND = 18.0      # leave headroom under the 25 WCU provisioned
+WCU_BUDGET_PER_SECOND = 8.0       # stay under the 10 WCU provisioned for the run
+INGEST_WRITE_CAPACITY = 10
+IDLE_WRITE_CAPACITY = 1
 CALENDAR_DAYS = 5                 # yesterday + today + 3 more (ingest can miss several days)
 
 
@@ -45,7 +51,8 @@ class WritePacer:
 
     def __init__(self, rate: float = WCU_BUDGET_PER_SECOND, burst: float = 100.0):
         self.rate, self.capacity = rate, burst
-        self.tokens = burst
+        # Start with one second of budget. A full burst would stampede a 10 WCU table.
+        self.tokens = min(burst, rate)
         self.last = time.monotonic()
 
     def consume(self, size_bytes: int) -> None:
@@ -77,6 +84,40 @@ def open_gtfs(cache: Path) -> GtfsStatic:
     if (cache / "stop_times.txt").exists():
         return GtfsStatic(cache)
     return GtfsStatic(ensure_gtfs(cache))
+
+
+def set_write_capacity(table: str, region: str, write_units: int) -> None:
+    """Set provisioned write capacity, leaving the current read capacity unchanged."""
+    ddb = boto3.client("dynamodb", region_name=region)
+    for _ in range(8):
+        desc = ddb.describe_table(TableName=table)["Table"]
+        status = desc["TableStatus"]
+        current = desc["ProvisionedThroughput"]
+        read, write = current["ReadCapacityUnits"], current["WriteCapacityUnits"]
+        if status == "ACTIVE" and write == write_units:
+            log.info("write capacity already %d (read %d)", write, read)
+            return
+        if status != "ACTIVE":
+            log.info("table %s; waiting before capacity change", status)
+            time.sleep(5)
+            continue
+        log.info("write capacity %d -> %d (read stays %d)", write, write_units, read)
+        try:
+            ddb.update_table(
+                TableName=table,
+                ProvisionedThroughput={"ReadCapacityUnits": read, "WriteCapacityUnits": write_units},
+            )
+        except ClientError as exc:
+            code = exc.response["Error"]["Code"]
+            if code in ("ResourceInUseException", "LimitExceededException"):
+                log.warning("capacity update not accepted (%s); retrying", code)
+                time.sleep(10)
+                continue
+            raise
+        ddb.get_waiter("table_exists").wait(TableName=table, WaiterConfig={"Delay": 5, "MaxAttempts": 60})
+        log.info("write capacity is now %d", write_units)
+        return
+    raise RuntimeError(f"could not set {table} write capacity to {write_units}")
 
 
 def main() -> int:
@@ -113,104 +154,129 @@ def main() -> int:
     if args.force:
         old_manifest = {}
 
-    pacer = WritePacer()
-    new_manifest: dict[str, str] = {}
-    stats = {"stops": 0, "written": 0, "unchanged": 0, "bytes": 0, "max_bytes": 0, "max_stop": "",
-             "deps_in": 0, "deps_kept": 0}
-    sizes: list[int] = []
-    collected: dict[str, list[StopTimetable]] = {LUAS: [], DART: [], TRAIN: []}
+    raised = False
 
-    def write_stop(stop: StopTimetable, mode: str | None = None) -> None:
-        if args.limit and stats["stops"] >= args.limit:
+    def restore_write_capacity(signum=None, _frame=None):
+        nonlocal raised
+        if not store or not raised:
+            if signum is not None:
+                raise SystemExit(128 + signum)
             return
-        stats["stops"] += 1
-        stats["deps_in"] += len(stop.departures)
-        keep_window_departures(stop, active)
-        stats["deps_kept"] += len(stop.departures)
-        rows = [d.to_row() for d in stop.departures]
-        h = content_hash([stop.stop_code, stop.stop_name, rows])
-        key = manifest_key(stop.stop_id, mode)
-        new_manifest[key] = h
-        if old_manifest.get(key) == h:
-            stats["unchanged"] += 1
-            return
+        raised = False
+        if signum is not None:
+            log.warning("received signal %s; restoring write capacity to %d", signum, IDLE_WRITE_CAPACITY)
+        try:
+            set_write_capacity(table, region, IDLE_WRITE_CAPACITY)
+        finally:
+            if signum is not None:
+                raise SystemExit(128 + signum)
+
+    try:
         if store:
-            size = store.put_stop(stop, feed_version, h, mode=mode)
-            pacer.consume(size)
+            raised = True
+            signal.signal(signal.SIGTERM, restore_write_capacity)
+            set_write_capacity(table, region, INGEST_WRITE_CAPACITY)
+
+        pacer = WritePacer()
+        new_manifest: dict[str, str] = {}
+        stats = {"stops": 0, "written": 0, "unchanged": 0, "bytes": 0, "max_bytes": 0, "max_stop": "",
+                 "deps_in": 0, "deps_kept": 0}
+        sizes: list[int] = []
+        collected: dict[str, list[StopTimetable]] = {LUAS: [], DART: [], TRAIN: []}
+
+        def write_stop(stop: StopTimetable, mode: str | None = None) -> None:
+            if args.limit and stats["stops"] >= args.limit:
+                return
+            stats["stops"] += 1
+            stats["deps_in"] += len(stop.departures)
+            keep_window_departures(stop, active)
+            stats["deps_kept"] += len(stop.departures)
+            rows = [d.to_row() for d in stop.departures]
+            h = content_hash([stop.stop_code, stop.stop_name, rows])
+            key = manifest_key(stop.stop_id, mode)
+            new_manifest[key] = h
+            if old_manifest.get(key) == h:
+                stats["unchanged"] += 1
+                return
+            if store:
+                size = store.put_stop(stop, feed_version, h, mode=mode)
+                pacer.consume(size)
+            else:
+                size = len(pack(rows)) + 200
+            sizes.append(size)
+            stats["written"] += 1
+            stats["bytes"] += size
+            if size > stats["max_bytes"]:
+                label = mode or "bus"
+                stats["max_bytes"], stats["max_stop"] = (
+                    size, f"{label} {stop.stop_id} {stop.stop_name} ({len(rows)} deps)")
+            if stats["written"] % 500 == 0:
+                log.info("... %d stops, %d written, %.1f MB, %.0fs", stats["stops"], stats["written"],
+                         stats["bytes"] / 1e6, time.perf_counter() - t0)
+
+        for stop in gtfs.all_bus_stop_timetables():
+            if args.limit and stats["stops"] >= args.limit:
+                break
+            write_stop(stop)
+
+        if not args.limit or stats["stops"] < args.limit:
+            for stop in gtfs.all_tram_stop_timetables():
+                if args.limit and stats["stops"] >= args.limit:
+                    break
+                collected[LUAS].append(stop)
+                write_stop(stop, LUAS)
+            for stop in gtfs.all_dart_stop_timetables():
+                if args.limit and stats["stops"] >= args.limit:
+                    break
+                collected[DART].append(stop)
+                write_stop(stop, DART)
+            for stop in gtfs.all_commuter_stop_timetables():
+                if args.limit and stats["stops"] >= args.limit:
+                    break
+                collected[TRAIN].append(stop)
+                write_stop(stop, TRAIN)
+
+        # Remove stops that disappeared from the feed.
+        removed = [sid for sid in old_manifest if sid not in new_manifest] if not args.limit else []
+        if store:
+            for key in removed:
+                mode, sid = parse_manifest_key(key)
+                store.delete_stop(sid, mode)
+                pacer.consume(1024)
+
+        codes = gtfs.stop_code_map()
+        luas_stations = gtfs.luas_station_catalog(collected[LUAS] or None)
+        dart_stations = gtfs.dart_station_catalog(collected[DART] or None)
+        train_stations = gtfs.train_station_catalog(collected[TRAIN] or None)
+        if store:
+            store.put_stop_codes(codes)
+            store.put_stations(LUAS, luas_stations)
+            store.put_stations(DART, dart_stations)
+            store.put_stations(TRAIN, train_stations)
+            store.put_calendar(calendar)
+            store.put_manifest(new_manifest, feed_version)
         else:
-            size = len(pack(rows)) + 200
-        sizes.append(size)
-        stats["written"] += 1
-        stats["bytes"] += size
-        if size > stats["max_bytes"]:
-            label = mode or "bus"
-            stats["max_bytes"], stats["max_stop"] = (
-                size, f"{label} {stop.stop_id} {stop.stop_name} ({len(rows)} deps)")
-        if stats["written"] % 500 == 0:
-            log.info("... %d stops, %d written, %.1f MB, %.0fs", stats["stops"], stats["written"],
-                     stats["bytes"] / 1e6, time.perf_counter() - t0)
+            log.info("stop codes item %.1f KB, calendar item %.1f KB, manifest item %.1f KB",
+                     len(pack({c: [v["stop_id"], v["stop_name"]] for c, v in codes.items()})) / 1024,
+                     len(pack({k: sorted(v) for k, v in calendar.items()})) / 1024,
+                     len(pack(new_manifest)) / 1024)
+            log.info("stations LUAS %d, DART %d, TRAIN %d",
+                     len(luas_stations), len(dart_stations), len(train_stations))
 
-    for stop in gtfs.all_bus_stop_timetables():
-        if args.limit and stats["stops"] >= args.limit:
-            break
-        write_stop(stop)
-
-    if not args.limit or stats["stops"] < args.limit:
-        for stop in gtfs.all_tram_stop_timetables():
-            if args.limit and stats["stops"] >= args.limit:
-                break
-            collected[LUAS].append(stop)
-            write_stop(stop, LUAS)
-        for stop in gtfs.all_dart_stop_timetables():
-            if args.limit and stats["stops"] >= args.limit:
-                break
-            collected[DART].append(stop)
-            write_stop(stop, DART)
-        for stop in gtfs.all_commuter_stop_timetables():
-            if args.limit and stats["stops"] >= args.limit:
-                break
-            collected[TRAIN].append(stop)
-            write_stop(stop, TRAIN)
-
-    # Remove stops that disappeared from the feed.
-    removed = [sid for sid in old_manifest if sid not in new_manifest] if not args.limit else []
-    if store:
-        for key in removed:
-            mode, sid = parse_manifest_key(key)
-            store.delete_stop(sid, mode)
-            pacer.consume(1024)
-
-    codes = gtfs.stop_code_map()
-    luas_stations = gtfs.luas_station_catalog(collected[LUAS] or None)
-    dart_stations = gtfs.dart_station_catalog(collected[DART] or None)
-    train_stations = gtfs.train_station_catalog(collected[TRAIN] or None)
-    if store:
-        store.put_stop_codes(codes)
-        store.put_stations(LUAS, luas_stations)
-        store.put_stations(DART, dart_stations)
-        store.put_stations(TRAIN, train_stations)
-        store.put_calendar(calendar)
-        store.put_manifest(new_manifest, feed_version)
-    else:
-        log.info("stop codes item %.1f KB, calendar item %.1f KB, manifest item %.1f KB",
-                 len(pack({c: [v["stop_id"], v["stop_name"]] for c, v in codes.items()})) / 1024,
-                 len(pack({k: sorted(v) for k, v in calendar.items()})) / 1024,
-                 len(pack(new_manifest)) / 1024)
-        log.info("stations LUAS %d, DART %d, TRAIN %d",
-                 len(luas_stations), len(dart_stations), len(train_stations))
-
-    if sizes:
-        sizes.sort()
-        pct = lambda p: sizes[min(len(sizes) - 1, int(p * len(sizes)))]
-        log.info("item size bytes: p50 %d, p90 %d, p99 %d, max %d (%s)",
-                 pct(0.5), pct(0.9), pct(0.99), stats["max_bytes"], stats["max_stop"])
-    in_, kept = stats["deps_in"], stats["deps_kept"]
-    log.info("departures kept %d / %d (%.0f%%) for %d-day window",
-             kept, in_, (100.0 * kept / in_) if in_ else 0.0, CALENDAR_DAYS)
-    log.info("done: %d stops, %d written, %d unchanged, %d removed, %.1f MB, %d stop codes, %.0fs%s",
-             stats["stops"], stats["written"], stats["unchanged"], len(removed), stats["bytes"] / 1e6,
-             len(codes), time.perf_counter() - t0, " (dry run)" if args.dry_run else "")
-    return 0
+        if sizes:
+            sizes.sort()
+            pct = lambda p: sizes[min(len(sizes) - 1, int(p * len(sizes)))]
+            log.info("item size bytes: p50 %d, p90 %d, p99 %d, max %d (%s)",
+                     pct(0.5), pct(0.9), pct(0.99), stats["max_bytes"], stats["max_stop"])
+        in_, kept = stats["deps_in"], stats["deps_kept"]
+        log.info("departures kept %d / %d (%.0f%%) for %d-day window",
+                 kept, in_, (100.0 * kept / in_) if in_ else 0.0, CALENDAR_DAYS)
+        log.info("done: %d stops, %d written, %d unchanged, %d removed, %.1f MB, %d stop codes, %.0fs%s",
+                 stats["stops"], stats["written"], stats["unchanged"], len(removed), stats["bytes"] / 1e6,
+                 len(codes), time.perf_counter() - t0, " (dry run)" if args.dry_run else "")
+        return 0
+    finally:
+        restore_write_capacity()
 
 
 if __name__ == "__main__":
