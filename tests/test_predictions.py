@@ -115,3 +115,84 @@ def test_selection_window_takes_all_within_window_up_to_max():
     stop = stop_with(*[dep(f"t{i}", str(i), parse_gtfs_time("20:00:00") + i * 60) for i in range(1, 12)])
     chosen = select_for_speech(predict(stop, CAL, None, now), now)
     assert len(chosen) == 8                                   # 9 within 10 min, capped at 8
+
+
+def _live(trip, seq=10):
+    return TripUpdate(trip, "r", "SCHEDULED", [stu(seq=seq, dep_delay=0)])
+
+
+def test_live_only_drops_scheduled_ghosts_and_keeps_later_live():
+    # Overlapping weekday calendars: close scheduled ghosts would otherwise fill min-3
+    # and hide a later live tram (Broadstone / Brides Glen pattern).
+    cal = {"20261003": {"91", "93"}}
+    stop = stop_with(
+        dep("live-a", "Green", parse_gtfs_time("20:03:00"), service="91", headsign="Broombridge"),
+        dep("ghost-b", "Green", parse_gtfs_time("20:04:00"), service="93", headsign="Broombridge"),
+        dep("ghost-glen", "Green", parse_gtfs_time("20:09:00"), service="93", headsign="Brides Glen"),
+        dep("live-c", "Green", parse_gtfs_time("20:21:00"), service="91", headsign="Sandyford"),
+    )
+    f = feed(_live("live-a"), _live("live-c"))
+    preds = predict(stop, cal, f, at(20, 0))
+    mixed = select_for_speech(preds, at(20, 0))
+    assert [p.trip_id for p in mixed] == ["live-a", "ghost-b", "ghost-glen"]
+    chosen = select_for_speech(preds, at(20, 0), live_only=True)
+    assert [p.trip_id for p in chosen] == ["live-a", "live-c"]
+    assert all(p.realtime for p in chosen)
+
+
+def test_live_only_falls_back_when_no_live_rows():
+    stop = stop_with(
+        dep("t1", "Green", parse_gtfs_time("20:07:00"), headsign="Broombridge"),
+        dep("t2", "Green", parse_gtfs_time("20:14:00"), headsign="Broombridge"),
+        dep("t3", "Green", parse_gtfs_time("20:21:00"), headsign="Broombridge"),
+    )
+    f = feed()  # feed present, but no usable updates
+    preds = predict(stop, CAL, f, at(20, 0))
+    assert all(not p.realtime for p in preds)
+    chosen = select_for_speech(preds, at(20, 0), live_only=True)
+    assert [p.trip_id for p in chosen] == ["t1", "t2", "t3"]
+
+
+def test_trip_in_feed_without_stop_update_is_not_live():
+    stop = stop_with(dep("t1", "Green", parse_gtfs_time("20:13:00"), seq=10, headsign="Sandyford"))
+    f = feed(TripUpdate("t1", "r", "SCHEDULED", [stu(seq=2, dep_delay=None)]))
+    preds = predict(stop, CAL, f, at(20, 6))
+    assert len(preds) == 1 and preds[0].realtime is False
+    chosen = select_for_speech(preds, at(20, 6), live_only=True)
+    assert [p.trip_id for p in chosen] == ["t1"]  # no live rows, timetable fallback
+
+
+def test_bus_mix_keeps_scheduled_when_live_only_off():
+    stop = stop_with(
+        dep("t1", "23", parse_gtfs_time("20:13:00")),
+        dep("t2", "E2", parse_gtfs_time("20:15:00")),
+        dep("t4", "23", parse_gtfs_time("20:40:00")),
+    )
+    f = feed(_live("t1"))
+    preds = predict(stop, CAL, f, at(20, 6))
+    chosen = select_for_speech(preds, at(20, 6))
+    assert [p.trip_id for p in chosen] == ["t1", "t2", "t4"]
+    assert chosen[0].realtime and not chosen[1].realtime
+
+
+def test_slot_collapse_prefers_live_copy():
+    cal = {"20261003": {"91", "93"}}
+    stop = stop_with(
+        dep("ghost", "Green", parse_gtfs_time("20:13:00"), service="93", seq=10, headsign="Broombridge"),
+        dep("live", "Green", parse_gtfs_time("20:13:00"), service="91", seq=10, headsign="Broombridge"),
+    )
+    f = feed(_live("live"))
+    preds = predict(stop, cal, f, at(20, 6))
+    assert [p.trip_id for p in preds] == ["live"]
+    assert preds[0].realtime
+
+
+def test_slot_collapse_keeps_one_timetable_copy_without_feed():
+    cal = {"20261003": {"91", "93"}}
+    stop = stop_with(
+        dep("a", "Green", parse_gtfs_time("20:13:00"), service="91", seq=10, headsign="Broombridge"),
+        dep("b", "Green", parse_gtfs_time("20:13:00"), service="93", seq=10, headsign="Broombridge"),
+    )
+    preds = predict(stop, cal, None, at(20, 6))
+    assert len(preds) == 1
+    assert preds[0].trip_id == "a"

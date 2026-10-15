@@ -62,7 +62,8 @@ def main() -> int:
     except (RealtimeError, KeyError):
         rt = None
     preds = predict(stop, cal, rt, now) if stop else []
-    print(next_trams_speech(spoken_name(chosen.stop_name), select_for_speech(preds, now), now,
+    print(next_trams_speech(spoken_name(chosen.stop_name),
+                            select_for_speech(preds, now, live_only=(rt is not None)), now,
                             realtime_available=rt is not None))
     return 0
 

@@ -124,7 +124,7 @@ class LuasService:
             raise TimetableNotLoaded(f"no LUAS timetable item for {ref.stop_id}")
         rt = self.realtime.get(int(now.timestamp()))
         preds = predict(stop, self._calendar, rt.feed, now)
-        chosen = select_for_speech(preds, now)
+        chosen = select_for_speech(preds, now, live_only=(rt.feed is not None))
         log.info("luas %s: %d upcoming, %d chosen, realtime=%s(age %ss), %.2fs",
                  ref.stop_id, len(preds), len(chosen), rt.status, rt.age_seconds, time.perf_counter() - t0)
         label = spoken_name(ref.stop_name)

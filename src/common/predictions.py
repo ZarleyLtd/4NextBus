@@ -98,17 +98,42 @@ def _pick_delay(u) -> int | None:
     return None
 
 
+def _slot_key(dep: Departure, scheduled: datetime) -> tuple:
+    return (dep.route, dep.headsign, int(scheduled.timestamp()), dep.stop_sequence)
+
+
+def _prefer_slot(kept: Prediction, newbie: Prediction) -> Prediction:
+    if newbie.realtime and not kept.realtime:
+        return newbie
+    return kept
+
+
+def _collapse_slots(items: list[tuple[tuple, Prediction]]) -> list[Prediction]:
+    """One prediction per passenger slot; keep a live copy when TFI published duplicates."""
+    by_slot: dict[tuple, Prediction] = {}
+    order: list[tuple] = []
+    for key, pred in items:
+        prev = by_slot.get(key)
+        if prev is None:
+            by_slot[key] = pred
+            order.append(key)
+        else:
+            by_slot[key] = _prefer_slot(prev, pred)
+    return [by_slot[key] for key in order]
+
+
 def predict(stop: StopTimetable, calendar: ServiceCalendar, feed: RealtimeFeed | None, now: datetime) -> list[Prediction]:
     """All upcoming predictions for the stop, soonest first (not yet trimmed for speech)."""
     trips = feed.trips if feed else {}
-    preds: list[Prediction] = []
+    items: list[tuple[tuple, Prediction]] = []
     for dep, scheduled in _active_departures(stop, calendar, now):
         p = _apply_realtime(dep, stop.stop_id, scheduled, trips.get(dep.trip_id))
         if p is None:
             continue
         if p.predicted < now - LOOKBACK:
             continue
-        preds.append(p)
+        items.append((_slot_key(dep, scheduled), p))
+    preds = _collapse_slots(items)
     preds.sort(key=lambda p: p.predicted)
     return preds
 
@@ -116,8 +141,18 @@ def predict(stop: StopTimetable, calendar: ServiceCalendar, feed: RealtimeFeed |
 def select_for_speech(preds: list[Prediction], now: datetime,
                       window_minutes: int = WINDOW_MINUTES,
                       min_results: int = MIN_RESULTS,
-                      max_results: int = MAX_RESULTS) -> list[Prediction]:
-    """Everything due within `window_minutes`, but at least `min_results`, at most `max_results`."""
+                      max_results: int = MAX_RESULTS,
+                      live_only: bool = False) -> list[Prediction]:
+    """Everything due within `window_minutes`, but at least `min_results`, at most `max_results`.
+
+    When `live_only` and at least one row has a usable realtime update, scheduled
+    timetable-only rows are dropped so overlapping TFI calendars cannot invent journeys.
+    An empty live list falls back to the mixed timetable (feed down, or no tram in the feed).
+    """
+    if live_only:
+        live = [p for p in preds if p.realtime]
+        if live:
+            preds = live
     cutoff = now + timedelta(minutes=window_minutes)
     within = [p for p in preds if p.predicted <= cutoff]
     if len(within) < min_results:
